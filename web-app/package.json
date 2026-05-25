@@ -20,7 +20,10 @@
     "viem": "^1.21.0",
     "react-router-dom": "^6.20.0",
     "axios": "^1.6.0",
-    "zustand": "^4.4.0"
+    "zustand": "^4.4.0",
+    "recharts": "^2.10.0",
+    "crypto-js": "^4.2.0",
+    "ipfs-http-client": "^60.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.37",
