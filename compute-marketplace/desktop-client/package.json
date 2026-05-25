@@ -1,0 +1,52 @@
+{
+  "name": "compute-marketplace-desktop",
+  "version": "1.0.0",
+  "description": "Desktop Host Client for ComputeMarket - GPU Sharing Daemon",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux"
+  },
+  "dependencies": {
+    "ethers": "^6.9.0",
+    "libp2p": "^1.0.0",
+    "@libp2p/tcp": "^9.0.0",
+    "@libp2p/websockets": "^8.0.0",
+    "@libp2p/mplex": "^10.0.0",
+    "@libp2p/crypto": "^4.0.0",
+    "dockerode": "^4.0.0",
+    "express": "^4.18.0",
+    "cors": "^2.8.5",
+    "node-fetch": "^3.3.0",
+    "better-sqlite3": "^9.0.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.0"
+  },
+  "build": {
+    "appId": "com.computemarket.desktop",
+    "productName": "ComputeMarket Host",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "Utility"
+    },
+    "win": {
+      "target": ["nsis"]
+    },
+    "mac": {
+      "target": ["dmg"]
+    }
+  }
+}
