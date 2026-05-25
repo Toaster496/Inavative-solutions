@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ComputeMarket Host Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #fff;
+      min-height: 100vh;
+    }
+    .header {
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .header h1 { font-size: 24px; }
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
+    }
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ef4444;
+    }
+    .status-dot.active { background: #10b981; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .main { padding: 40px; max-width: 1400px; margin: 0 auto; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 24px; }
+    .card {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .card h3 { margin-bottom: 16px; font-size: 18px; }
+    .stat { font-size: 32px; font-weight: bold; color: #38ef7d; }
+    .stat-label { font-size: 14px; opacity: 0.7; margin-top: 4px; }
+    button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    button:hover { opacity: 0.9; transform: translateY(-1px); }
+    button.stop { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+    .logs { 
+      background: rgba(0,0,0,0.3); 
+      border-radius: 8px; 
+      padding: 16px; 
+      max-height: 400px; 
+      overflow-y: auto; 
+      font-family: monospace; 
+      font-size: 13px;
+    }
+    .log-entry { padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .log-info { color: #3b82f6; }
+    .log-warning { color: #f59e0b; }
+    .log-error { color: #ef4444; }
+    .gpu-list { list-style: none; }
+    .gpu-item { 
+      padding: 12px; 
+      background: rgba(0,0,0,0.2); 
+      border-radius: 8px; 
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .controls { display: flex; gap: 12px; margin-bottom: 24px; }
+    input, select {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: white;
+      padding: 12px 16px;
+      border-radius: 8px;
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>🖥️ ComputeMarket Host</h1>
+      <p style="opacity: 0.7; font-size: 14px;">Desktop Daemon for GPU Sharing</p>
+    </div>
+    <div class="status-indicator">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Stopped</span>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="controls">
+      <button id="startBtn" onclick="startHosting()">▶ Start Hosting</button>
+      <button id="stopBtn" class="stop" onclick="stopHosting()" disabled>⏹ Stop Hosting</button>
+      <button onclick="refreshStatus()">🔄 Refresh</button>
+      <button onclick="withdrawEarnings()">💰 Withdraw</button>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Host Status</h3>
+        <div class="stat" id="peerId">-</div>
+        <div class="stat-label">Libp2p Peer ID</div>
+      </div>
+      <div class="card">
+        <h3>Active Job</h3>
+        <div class="stat" id="activeJob">None</div>
+        <div class="stat-label">Current Job ID</div>
+      </div>
+      <div class="card">
+        <h3>Total Earnings</h3>
+        <div class="stat" id="earnings">0.00 CPT</div>
+        <div class="stat-label">Lifetime Earnings</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card" style="grid-column: span 2;">
+        <h3>GPU Hardware</h3>
+        <ul class="gpu-list" id="gpuList">
+          <li class="gpu-item">Loading...</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Quick Stats</h3>
+        <div style="display: grid; gap: 12px;">
+          <div>
+            <div style="font-size: 24px; font-weight: bold;" id="cpuInfo">-</div>
+            <div style="font-size: 12px; opacity: 0.7;">CPU</div>
+          </div>
+          <div>
+            <div style="font-size: 24px; font-weight: bold;" id="ramInfo">-</div>
+            <div style="font-size: 12px; opacity: 0.7;">RAM</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 24px;">
+      <h3>Daemon Logs</h3>
+      <div class="logs" id="logsContainer">
+        <div class="log-entry log-info">Waiting for daemon to start...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let statusInterval = null;
+
+    async function refreshStatus() {
+      try {
+        const status = await window.electronAPI.getHostStatus();
+        
+        // Update status indicator
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        
+        if (status.isRunning) {
+          statusDot.classList.add('active');
+          statusText.textContent = 'Running';
+          startBtn.disabled = true;
+          stopBtn.disabled = false;
+        } else {
+          statusDot.classList.remove('active');
+          statusText.textContent = 'Stopped';
+          startBtn.disabled = false;
+          stopBtn.disabled = true;
+        }
+        
+        // Update stats
+        document.getElementById('peerId').textContent = status.peerId || '-';
+        document.getElementById('activeJob').textContent = 
+          status.activeJob ? `#${status.activeJob.jobId}` : 'None';
+        document.getElementById('earnings').textContent = 
+          `${(Number(status.earnings) / 1e18).toFixed(2)} CPT`;
+        
+        // Update GPU info
+        const gpuList = document.getElementById('gpuList');
+        if (status.gpuInfo && status.gpuInfo.gpus && status.gpuInfo.gpus.length > 0) {
+          gpuList.innerHTML = status.gpuInfo.gpus.map(gpu => `
+            <li class="gpu-item">
+              <span>${gpu.name}</span>
+              <span style="color: #38ef7d;">${gpu.memory}</span>
+            </li>
+          `).join('');
+        } else {
+          gpuList.innerHTML = '<li class="gpu-item">No GPU detected</li>';
+        }
+        
+        // Update system info
+        if (status.gpuInfo) {
+          document.getElementById('cpuInfo').textContent = status.gpuInfo.cpu;
+          document.getElementById('ramInfo').textContent = status.gpuInfo.ram;
+        }
+        
+        // Update logs
+        updateLogs();
+        
+      } catch (error) {
+        console.error('Failed to refresh status:', error);
+      }
+    }
+
+    async function updateLogs() {
+      try {
+        const logs = await window.electronAPI.getLogs();
+        const container = document.getElementById('logsContainer');
+        
+        container.innerHTML = logs.map(log => {
+          const time = new Date(log.timestamp).toLocaleTimeString();
+          return `<div class="log-entry log-${log.level}">[${time}] ${log.message}</div>`;
+        }).reverse().join('');
+        
+        container.scrollTop = 0;
+      } catch (error) {
+        console.error('Failed to get logs:', error);
+      }
+    }
+
+    async function startHosting() {
+      try {
+        await window.electronAPI.startHosting();
+        setTimeout(refreshStatus, 1000);
+      } catch (error) {
+        alert('Failed to start hosting: ' + error.message);
+      }
+    }
+
+    async function stopHosting() {
+      try {
+        await window.electronAPI.stopHosting();
+        setTimeout(refreshStatus, 1000);
+      } catch (error) {
+        alert('Failed to stop hosting: ' + error.message);
+      }
+    }
+
+    async function withdrawEarnings() {
+      try {
+        const result = await window.electronAPI.withdrawEarnings();
+        if (result.success) {
+          alert(`Withdrawn ${result.amount} CPT to ${result.address}`);
+        } else {
+          alert(result.message);
+        }
+      } catch (error) {
+        alert('Withdrawal failed: ' + error.message);
+      }
+    }
+
+    // Auto-refresh every 5 seconds
+    setInterval(refreshStatus, 5000);
+    
+    // Initial load
+    refreshStatus();
+  </script>
+</body>
+</html>
