@@ -125,7 +125,7 @@ nvidia-smi
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/Toaster496/Inavative-solutions
 cd ComputeMarket
 
 # 1. Deploy contracts (requires BNB testnet tokens)
