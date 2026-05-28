@@ -57,7 +57,8 @@ npm run compile
 npm run deploy:testnet
 ```
 
-**Important:** Save the contract addresses from the deployment output!
+> [!IMPORTANT]
+> Save the contract addresses from the deployment output!
 
 ### Step 3: Configure Web App
 
