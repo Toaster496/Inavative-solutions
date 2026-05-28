@@ -207,7 +207,7 @@ PRIVATE_KEY="your_ethereum_private_key_here"
 BSC_TESTNET_URL="https://data-seed-preload1-s1.bscnode.com/"
 ```
 
-> ⚠️ **Security Warning**: The `.env` file is in `.gitignore`, but always double-check before committing!
+> [!WARNING] The `.env` file is in `.gitignore`, but always double-check before committing!
 
 #### Step 1.3: Get Testnet BNB
 
