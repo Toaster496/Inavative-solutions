@@ -185,6 +185,6 @@ After deployment:
 
 ## Support
 
-- Check the main [README.md](../README.md) for detailed documentation
+- Check the main [README.md]([https://github.com/Toaster496/Inavative-solutions/blob/main/README.md]) for detailed documentation
 - Review troubleshooting section in README
 - Check contract events on [BSCScan](https://testnet.bscscan.com/)
