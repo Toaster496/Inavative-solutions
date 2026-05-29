@@ -1,6 +1,6 @@
 # ComputeMarket - Decentralized GPU/Compute Hosting Platform
 
-A fully functional decentralized marketplace for GPU compute resources, similar to Vast.ai but built on blockchain with its own cryptocurrency (CPT) and 25% protocol fee.
+A fully functional decentralized marketplace for GPU compute resources, similar to Vast.ai and Claude.ai but built on blockchain with its own cryptocurrency (CPT) and 25% protocol fee.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![BSC Testnet](https://img.shields.io/badge/Network-BSC%20Testnet%20(97)-gold)](https://testnet.bscscan.com/)
