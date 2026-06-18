@@ -1,1 +1,238 @@
-*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;min-height:100vh}#root{min-height:100vh}button{cursor:pointer;border:none;outline:none;transition:all .2s ease}button:hover{transform:translateY(-1px)}button:active{transform:translateY(0)}input,textarea,select{font-family:inherit;font-size:inherit}.card{background:#ffffff0d;backdrop-filter:blur(10px);border-radius:12px;padding:24px;border:1px solid rgba(255,255,255,.1)}.btn-primary{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:12px 24px;border-radius:8px;font-weight:600}.btn-primary:hover{opacity:.9;box-shadow:0 4px 12px #667eea66}.btn-secondary{background:#ffffff1a;color:#fff;padding:12px 24px;border-radius:8px;font-weight:600}.btn-secondary:hover{background:#fff3}.btn-success{background:linear-gradient(135deg,#11998e,#38ef7d);color:#fff;padding:12px 24px;border-radius:8px;font-weight:600}.input-dark{background:#0000004d;border:1px solid rgba(255,255,255,.1);color:#fff;padding:12px 16px;border-radius:8px;width:100%}.input-dark:focus{border-color:#667eea;outline:none}.status-badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;text-transform:uppercase}.status-open{background:#3b82f6}.status-accepted{background:#8b5cf6}.status-running{background:#f59e0b}.status-completed{background:#10b981}.status-disputed{background:#ef4444}.status-cancelled{background:#6b7280}
+/* ComputeMarket - Hand-crafted brutalist/retro terminal style */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #0a0a0a;
+  color: #00ff41;
+  min-height: 100vh;
+  line-height: 1.6;
+  border: 8px solid #333;
+}
+
+#root {
+  min-height: 100vh;
+  padding: 20px;
+}
+
+button {
+  cursor: pointer;
+  border: 3px solid #00ff41;
+  outline: none;
+  background: #000;
+  color: #00ff41;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  padding: 15px 30px;
+  transition: all 0.1s steps(1);
+}
+
+button:hover {
+  background: #00ff41;
+  color: #000;
+  box-shadow: 5px 5px 0px #fff;
+  transform: translate(-2px, -2px);
+}
+
+button:active {
+  transform: translate(0, 0);
+  box-shadow: 0 0 0 #fff;
+}
+
+input, textarea, select {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  background: #111;
+  border: 2px dashed #00ff41;
+  color: #00ff41;
+  padding: 12px;
+  width: 100%;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-style: solid;
+  box-shadow: 3px 3px 0px #00ff41;
+}
+
+.card {
+  background: #111;
+  border: 3px double #00ff41;
+  padding: 20px;
+  position: relative;
+}
+
+.card::before {
+  content: '[';
+  position: absolute;
+  top: -5px;
+  left: 10px;
+  background: #0a0a0a;
+  padding: 0 5px;
+  color: #00ff41;
+}
+
+.card::after {
+  content: ']';
+  position: absolute;
+  top: -5px;
+  right: 10px;
+  background: #0a0a0a;
+  padding: 0 5px;
+  color: #00ff41;
+}
+
+.btn-primary {
+  background: #000;
+  color: #00ff41;
+  border: 3px solid #00ff41;
+  padding: 15px 30px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.btn-primary:hover {
+  background: #00ff41;
+  color: #000;
+  box-shadow: 5px 5px 0px #fff;
+}
+
+.btn-secondary {
+  background: #222;
+  color: #ccc;
+  border: 3px solid #666;
+  padding: 15px 30px;
+  font-weight: bold;
+}
+
+.btn-secondary:hover {
+  background: #666;
+  color: #000;
+}
+
+.btn-success {
+  background: #000;
+  color: #00ff41;
+  border: 3px solid #00ff41;
+  padding: 15px 30px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.input-dark {
+  background: #111;
+  border: 2px dashed #00ff41;
+  color: #00ff41;
+  padding: 12px 16px;
+  width: 100%;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.input-dark:focus {
+  border-style: solid;
+  box-shadow: 3px 3px 0px #00ff41;
+  outline: none;
+}
+
+.status-badge {
+  padding: 5px 15px;
+  border: 2px solid;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: inline-block;
+}
+
+.status-open {
+  background: #000;
+  color: #00bfff;
+  border-color: #00bfff;
+}
+
+.status-accepted {
+  background: #000;
+  color: #bf00ff;
+  border-color: #bf00ff;
+}
+
+.status-running {
+  background: #000;
+  color: #ffaa00;
+  border-color: #ffaa00;
+}
+
+.status-completed {
+  background: #000;
+  color: #00ff41;
+  border-color: #00ff41;
+}
+
+.status-disputed {
+  background: #000;
+  color: #ff3333;
+  border-color: #ff3333;
+}
+
+.status-cancelled {
+  background: #000;
+  color: #666;
+  border-color: #666;
+}
+
+/* ASCII art decorative elements */
+.header-ascii {
+  font-size: 10px;
+  line-height: 1.2;
+  white-space: pre;
+  color: #00ff41;
+  margin-bottom: 20px;
+}
+
+/* Scanline effect */
+.scanline {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(0, 255, 65, 0.3);
+  animation: scan 3s linear infinite;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+@keyframes scan {
+  0% { top: 0%; }
+  100% { top: 100%; }
+}
+
+/* Blinking cursor effect */
+.cursor-blink {
+  animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* Glitch effect on hover */
+.glitch-hover:hover {
+  animation: glitch 0.3s steps(2);
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); }
+  25% { transform: translate(-2px, 2px); }
+  50% { transform: translate(2px, -2px); }
+  75% { transform: translate(-2px, -2px); }
+  100% { transform: translate(0); }
+}
