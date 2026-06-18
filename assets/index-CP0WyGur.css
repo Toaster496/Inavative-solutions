@@ -1,147 +1,199 @@
-/* ComputeMarket — built by hand, no vibes */
+/* 
+======================================================
+COMPUTE MARKET - ETHEREAL / CELESTIAL DESIGN
+======================================================
+*/
 
-@import url('https://fonts.googleapis.com/css2?family=VT323&family=Special+Elite&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Outfit:wght@300;400;500&display=swap');
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --pearl: #ffffff;
+  --alabaster: #faf9f6;
+  --halo-gold: #e6c875;
+  --divine-gold: #cca847;
+  --twilight-blue: #1a202c;
+  --cloud-shadow: rgba(204, 168, 71, 0.15);
+}
 
-html {
-  background:
-    repeating-linear-gradient(0deg, transparent 0 3px, rgba(0,0,0,0.04) 3px 4px),
-    #f5e9d4;
+/* Base Resets */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-  font-family: 'Special Elite', 'Courier New', monospace;
-  color: #2b1d0e;
+  font-family: 'Outfit', sans-serif;
+  background: radial-gradient(circle at 50% 0%, var(--pearl) 0%, var(--alabaster) 100%);
+  color: var(--twilight-blue);
   min-height: 100vh;
-  line-height: 1.5;
-  padding: 24px;
-  max-width: 1100px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+#root {
+  padding: 40px 20px;
+  max-width: 1200px;
   margin: 0 auto;
-  background: #fffaf0;
-  border-left: 1px dashed #8a7a5c;
-  border-right: 1px dashed #8a7a5c;
+  position: relative;
+  z-index: 1;
 }
 
+/* Ambient Background Glows */
+body::before, body::after {
+  content: '';
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(230, 200, 117, 0.15) 0%, transparent 70%);
+  z-index: -1;
+  animation: breathe 10s ease-in-out infinite alternate;
+}
+
+body::before { top: -200px; left: -100px; }
+body::after { bottom: -200px; right: -100px; animation-delay: -5s; }
+
+/* Breathtaking Typography */
 h1, h2, h3 {
-  font-family: 'VT323', monospace;
-  letter-spacing: 1px;
-  color: #6b1f1f;
-  border-bottom: 2px solid #2b1d0e;
-  padding-bottom: 4px;
-  margin-bottom: 12px;
-  transform: rotate(-0.4deg); /* slightly off-kilter */
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  color: var(--twilight-blue);
+  letter-spacing: 2px;
+  text-align: center;
 }
 
-h1::before { content: "// "; color: #b08545; }
-h2::before { content: "## "; color: #b08545; }
-
-a {
-  color: #1c4587;
-  text-decoration: underline wavy;
-  text-underline-offset: 3px;
-}
-a:hover { background: #fff176; color: #6b1f1f; }
-
-button {
-  cursor: pointer;
-  font-family: 'VT323', monospace;
-  font-size: 18px;
-  background: #fffaf0;
-  color: #2b1d0e;
-  border: 2px solid #2b1d0e;
-  padding: 8px 18px;
-  box-shadow: 4px 4px 0 #2b1d0e;
-  transition: none;
-}
-button:hover {
-  background: #ffe066;
-  transform: translate(-1px, -1px);
-  box-shadow: 5px 5px 0 #6b1f1f;
-}
-button:active {
-  transform: translate(4px, 4px);
-  box-shadow: 0 0 0 #2b1d0e;
+h1 {
+  font-size: 3.5rem;
+  margin-bottom: 30px;
+  background: linear-gradient(to right, var(--twilight-blue), var(--divine-gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: subtleFloat 6s ease-in-out infinite;
 }
 
+/* Floating, Weightless Cards */
+.card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 24px; /* Soft, pill-like corners */
+  padding: 40px;
+  margin-bottom: 20px;
+  box-shadow: 
+    0 10px 40px var(--cloud-shadow),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5); /* Inner rim light */
+  transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 
+    0 20px 50px rgba(204, 168, 71, 0.25),
+    inset 0 0 0 1px rgba(255, 255, 255, 1);
+}
+
+/* Ethereal Inputs */
 input, textarea, select {
-  font-family: 'Special Elite', monospace;
-  font-size: 15px;
-  background: #fffdf5;
-  border: none;
-  border-bottom: 2px dotted #2b1d0e;
-  color: #2b1d0e;
-  padding: 6px 4px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 300;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(204, 168, 71, 0.3);
+  border-radius: 12px;
+  color: var(--twilight-blue);
+  padding: 16px 20px;
   width: 100%;
+  transition: all 0.3s ease;
 }
+
 input:focus, textarea:focus, select:focus {
   outline: none;
-  background: #fff176;
-  border-bottom-style: solid;
+  background: var(--pearl);
+  border-color: var(--divine-gold);
+  box-shadow: 0 0 20px rgba(204, 168, 71, 0.15);
 }
 
-.card {
-  background: #fffdf5;
-  border: 1px solid #2b1d0e;
-  padding: 18px 20px;
-  margin: 14px 0;
+/* Divine Buttons */
+button, .btn {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--twilight-blue);
+  border: 1px solid var(--divine-gold);
+  border-radius: 50px; /* Perfect pill shape */
+  padding: 14px 32px;
+  cursor: pointer;
   position: relative;
-  box-shadow: 6px 6px 0 rgba(43,29,14,0.15);
+  overflow: hidden;
+  transition: all 0.4s ease;
+  z-index: 1;
 }
-.card:nth-child(odd) { transform: rotate(-0.2deg); }
-.card:nth-child(even) { transform: rotate(0.3deg); }
 
-.card::before {
-  content: "✦";
+button::before {
+  content: '';
   position: absolute;
-  top: -10px; left: 12px;
-  background: #fffaf0;
-  padding: 0 6px;
-  color: #6b1f1f;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(135deg, var(--halo-gold), var(--divine-gold));
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
 }
 
-.btn-primary { background: #6b1f1f; color: #fffaf0; }
-.btn-primary:hover { background: #8a2828; color: #ffe066; }
+button:hover {
+  color: var(--pearl);
+  border-color: transparent;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(204, 168, 71, 0.3);
+}
 
-.btn-secondary { background: #fffaf0; }
+button:hover::before {
+  opacity: 1;
+}
 
-.btn-success { background: #2e5d3a; color: #fffaf0; }
-.btn-success:hover { background: #3d7a4d; }
-
+/* Delicate Status Badges */
 .status-badge {
-  font-family: 'VT323', monospace;
-  font-size: 14px;
-  padding: 2px 10px;
-  border: 1px solid #2b1d0e;
-  background: #fffdf5;
-  display: inline-block;
-}
-.status-badge::before { content: "● "; }
-
-.status-open       { color: #1c4587; }
-.status-accepted   { color: #6a1b9a; }
-.status-running    { color: #b8651b; background: #fff3cd; }
-.status-completed  { color: #2e5d3a; }
-.status-disputed   { color: #b71c1c; background: #ffebee; }
-.status-cancelled  { color: #6e6e6e; text-decoration: line-through; }
-
-/* tiny hand-drawn divider */
-hr {
-  border: none;
-  text-align: center;
-  margin: 24px 0;
-}
-hr::after {
-  content: "* * *";
-  color: #b08545;
-  letter-spacing: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 6px 16px;
+  border-radius: 30px;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--pearl);
+  border: 1px solid rgba(0,0,0,0.05);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.03);
 }
 
-/* footer signature */
-.signature {
-  font-family: 'VT323', monospace;
-  color: #8a7a5c;
-  text-align: center;
-  margin-top: 40px;
-  font-size: 14px;
+/* Status dots */
+.status-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.status-open { color: #5B8CFF; }
+.status-running { color: var(--divine-gold); }
+.status-completed { color: #4CAF50; }
+
+/* --- Celestial Animations --- */
+
+@keyframes breathe {
+  0% { transform: scale(1) translate(0, 0); opacity: 0.8; }
+  100% { transform: scale(1.2) translate(20px, -20px); opacity: 0.4; }
+}
+
+@keyframes subtleFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
 }
