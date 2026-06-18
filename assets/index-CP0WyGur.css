@@ -1,199 +1,318 @@
-/* 
-======================================================
-COMPUTE MARKET - ETHEREAL / CELESTIAL DESIGN
-======================================================
+/*
+══════════════════════════════════════════════════
+  COMPUTEMARKET — CELESTIAL EDITION
+  inspired by cathedral light & illuminated manuscripts
+══════════════════════════════════════════════════
 */
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Outfit:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Italiana&family=Inter:wght@300;400&display=swap');
 
 :root {
-  --pearl: #ffffff;
-  --alabaster: #faf9f6;
-  --halo-gold: #e6c875;
-  --divine-gold: #cca847;
-  --twilight-blue: #1a202c;
-  --cloud-shadow: rgba(204, 168, 71, 0.15);
+  --ivory: #faf6ee;
+  --cream: #f3ecdc;
+  --gold: #c9a961;
+  --gold-deep: #a8884a;
+  --gold-light: #e8d9b0;
+  --ink: #2a2520;
+  --whisper: #6b6358;
+  --halo: rgba(201, 169, 97, 0.25);
 }
 
-/* Base Resets */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: 'Outfit', sans-serif;
-  background: radial-gradient(circle at 50% 0%, var(--pearl) 0%, var(--alabaster) 100%);
-  color: var(--twilight-blue);
+  font-family: 'Cormorant Garamond', 'Garamond', serif;
+  font-weight: 300;
+  color: var(--ink);
   min-height: 100vh;
-  line-height: 1.6;
+  line-height: 1.7;
+  font-size: 18px;
+
+  /* soft radial light, like sun through stained glass */
+  background:
+    radial-gradient(ellipse at top, #fffdf7 0%, var(--ivory) 40%, var(--cream) 100%);
+  background-attachment: fixed;
+  
+  position: relative;
   overflow-x: hidden;
 }
 
+/* drifting light particles (the breathtaking part) */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, var(--halo) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(255, 245, 220, 0.4) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.3) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+  animation: float 20s ease-in-out infinite;
+}
+
+/* subtle grain so it doesn't look like a slick AI render */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  opacity: 0.06;
+  pointer-events: none;
+  z-index: 1;
+  mix-blend-mode: multiply;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-20px, 20px); }
+}
+
 #root {
-  padding: 40px 20px;
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  padding: 60px 40px;
   max-width: 1200px;
   margin: 0 auto;
-  position: relative;
-  z-index: 1;
 }
 
-/* Ambient Background Glows */
-body::before, body::after {
-  content: '';
-  position: absolute;
-  width: 600px;
-  height: 600px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(230, 200, 117, 0.15) 0%, transparent 70%);
-  z-index: -1;
-  animation: breathe 10s ease-in-out infinite alternate;
-}
-
-body::before { top: -200px; left: -100px; }
-body::after { bottom: -200px; right: -100px; animation-delay: -5s; }
-
-/* Breathtaking Typography */
+/* TYPOGRAPHY — like an illuminated manuscript */
 h1, h2, h3 {
-  font-family: 'Cinzel', serif;
-  font-weight: 600;
-  color: var(--twilight-blue);
-  letter-spacing: 2px;
+  font-family: 'Italiana', serif;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--ink);
   text-align: center;
+  margin-bottom: 24px;
 }
 
 h1 {
-  font-size: 3.5rem;
-  margin-bottom: 30px;
-  background: linear-gradient(to right, var(--twilight-blue), var(--divine-gold));
+  font-size: clamp(3rem, 6vw, 5rem);
+  line-height: 1.1;
+  letter-spacing: 0.12em;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, var(--ink) 0%, var(--gold-deep) 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: subtleFloat 6s ease-in-out infinite;
+  position: relative;
 }
 
-/* Floating, Weightless Cards */
+/* gold ornamental dividers under headings */
+h1::after, h2::after {
+  content: '✦';
+  display: block;
+  color: var(--gold);
+  font-size: 0.4em;
+  margin: 16px auto 0;
+  letter-spacing: 2em;
+  padding-left: 2em;
+}
+
+h2 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: var(--gold-deep);
+  margin-top: 60px;
+}
+
+h3 {
+  font-size: 1.5rem;
+  font-style: italic;
+  letter-spacing: 0.05em;
+}
+
+p {
+  font-size: 1.1rem;
+  color: var(--whisper);
+  max-width: 65ch;
+  margin: 0 auto 1em;
+}
+
+/* CARDS — like marble tablets with gold inlay */
 .card {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  border-radius: 24px; /* Soft, pill-like corners */
-  padding: 40px;
-  margin-bottom: 20px;
-  box-shadow: 
-    0 10px 40px var(--cloud-shadow),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.5); /* Inner rim light */
-  transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  background: linear-gradient(135deg, rgba(255,253,247,0.9), rgba(243,236,220,0.7));
+  backdrop-filter: blur(2px);
+  border: 1px solid var(--gold-light);
+  padding: 40px 36px;
+  margin: 24px 0;
+  position: relative;
+  transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* gold corner ornaments — handcrafted feel */
+.card::before,
+.card::after {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid var(--gold);
+}
+.card::before {
+  top: 8px; left: 8px;
+  border-right: none;
+  border-bottom: none;
+}
+.card::after {
+  bottom: 8px; right: 8px;
+  border-left: none;
+  border-top: none;
 }
 
 .card:hover {
-  transform: translateY(-8px);
-  box-shadow: 
-    0 20px 50px rgba(204, 168, 71, 0.25),
-    inset 0 0 0 1px rgba(255, 255, 255, 1);
+  transform: translateY(-3px);
+  border-color: var(--gold);
+  box-shadow:
+    0 20px 60px -20px rgba(201, 169, 97, 0.3),
+    0 0 80px -20px rgba(255, 245, 220, 0.6);
 }
 
-/* Ethereal Inputs */
-input, textarea, select {
-  font-family: 'Outfit', sans-serif;
-  font-weight: 300;
-  font-size: 16px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(204, 168, 71, 0.3);
-  border-radius: 12px;
-  color: var(--twilight-blue);
-  padding: 16px 20px;
+/* BUTTONS — like sacred seals */
+button, .btn {
+  font-family: 'Italiana', serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--gold);
+  padding: 16px 40px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.5s ease;
+}
+
+/* shimmer effect — the gasp moment */
+button::before, .btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
   width: 100%;
-  transition: all 0.3s ease;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 245, 220, 0.6),
+    transparent
+  );
+  transition: left 0.7s ease;
+}
+
+button:hover, .btn:hover {
+  background: var(--ink);
+  color: var(--ivory);
+  border-color: var(--ink);
+  letter-spacing: 0.3em;
+}
+
+button:hover::before, .btn:hover::before {
+  left: 100%;
+}
+
+.btn-primary {
+  background: var(--ink);
+  color: var(--gold-light);
+  border-color: var(--ink);
+}
+.btn-primary:hover {
+  background: var(--gold-deep);
+  color: var(--ivory);
+  border-color: var(--gold-deep);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-deep) 100%);
+  color: var(--ivory);
+  border-color: var(--gold-deep);
+}
+
+/* INPUTS — soft, whispery */
+input, textarea, select {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--gold-light);
+  color: var(--ink);
+  padding: 14px 4px;
+  width: 100%;
+  transition: border-color 0.4s ease;
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--whisper);
+  font-style: italic;
+  opacity: 0.6;
 }
 
 input:focus, textarea:focus, select:focus {
   outline: none;
-  background: var(--pearl);
-  border-color: var(--divine-gold);
-  box-shadow: 0 0 20px rgba(204, 168, 71, 0.15);
+  border-bottom-color: var(--gold);
 }
 
-/* Divine Buttons */
-button, .btn {
-  font-family: 'Cinzel', serif;
-  font-weight: 600;
-  font-size: 14px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  background: transparent;
-  color: var(--twilight-blue);
-  border: 1px solid var(--divine-gold);
-  border-radius: 50px; /* Perfect pill shape */
-  padding: 14px 32px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.4s ease;
-  z-index: 1;
-}
-
-button::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: linear-gradient(135deg, var(--halo-gold), var(--divine-gold));
-  z-index: -1;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-button:hover {
-  color: var(--pearl);
-  border-color: transparent;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(204, 168, 71, 0.3);
-}
-
-button:hover::before {
-  opacity: 1;
-}
-
-/* Delicate Status Badges */
+/* STATUS BADGES — like wax seals */
 .status-badge {
-  font-family: 'Outfit', sans-serif;
-  font-weight: 500;
+  font-family: 'Italiana', serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
   padding: 6px 16px;
-  border-radius: 30px;
-  font-size: 11px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--pearl);
-  border: 1px solid rgba(0,0,0,0.05);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+  border: 1px solid currentColor;
+  display: inline-block;
+  background: rgba(255, 253, 247, 0.6);
 }
 
-/* Status dots */
-.status-badge::before {
-  content: '';
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-  box-shadow: 0 0 8px currentColor;
+.status-open       { color: var(--gold-deep); }
+.status-accepted   { color: #8b6f9c; }
+.status-running    { color: #b8651b; }
+.status-completed  { color: #4a6b3a; }
+.status-disputed   { color: #a33a3a; }
+.status-cancelled  { color: var(--whisper); opacity: 0.6; }
+
+/* ornamental divider */
+hr {
+  border: none;
+  text-align: center;
+  margin: 60px 0;
+  overflow: visible;
+}
+hr::after {
+  content: '✦  ◆  ✦';
+  color: var(--gold);
+  letter-spacing: 1.5em;
+  font-size: 0.8rem;
 }
 
-.status-open { color: #5B8CFF; }
-.status-running { color: var(--divine-gold); }
-.status-completed { color: #4CAF50; }
-
-/* --- Celestial Animations --- */
-
-@keyframes breathe {
-  0% { transform: scale(1) translate(0, 0); opacity: 0.8; }
-  100% { transform: scale(1.2) translate(20px, -20px); opacity: 0.4; }
+/* links with soft gold underline */
+a {
+  color: var(--gold-deep);
+  text-decoration: none;
+  border-bottom: 1px solid var(--gold-light);
+  transition: border-color 0.3s ease;
+}
+a:hover {
+  border-bottom-color: var(--gold);
 }
 
-@keyframes subtleFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
+/* selection styling — small detail that wows */
+::selection {
+  background: var(--gold-light);
+  color: var(--ink);
 }
+
+/* scrollbar — divine touch */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--cream); }
+::-webkit-scrollbar-thumb { background: var(--gold); }
