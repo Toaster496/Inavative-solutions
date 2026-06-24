@@ -718,4 +718,7 @@ Permissionless and open source. Feel free to use, modify, and distribute.
 
 [Report Bug](../../issues) · [Request Feature](../../issues)
 
+<img width="1832" height="491" alt="image" src="https://github.com/user-attachments/assets/f9041b88-728c-4476-aa68-771e6df0fca3" />
+
+
 </div>
