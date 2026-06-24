@@ -29,6 +29,10 @@ A fully functional decentralized marketplace for GPU compute resources, similar 
 
 ---
 
+<img width="1200" height="600" alt="image" src="https://github.com/user-attachments/assets/544eb58c-bdce-433d-85b0-6495d08ba57f" />
+
+
+
 ## Overview
 
 ComputeMarket enables permissionless buying and selling of GPU/CPU compute power using blockchain technology. Key features:
@@ -710,5 +714,8 @@ Permissionless and open source. Feel free to use, modify, and distribute.
 **Built with ❤️ for decentralized computing**
 
 [Report Bug](../../issues) · [Request Feature](../../issues)
+
+![Uploading image.png…]()
+
 
 </div>
