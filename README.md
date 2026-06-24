@@ -5,6 +5,11 @@ A fully functional decentralized marketplace for GPU compute resources, similar 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![BSC Testnet](https://img.shields.io/badge/Network-BSC%20Testnet%20(97)-gold)](https://testnet.bscscan.com/)
 
+
+<img width="1200" height="600" alt="image" src="https://github.com/user-attachments/assets/1be7cbe7-a5cf-47cb-a4f2-2d155ab2ffdf" />
+
+
+
 ---
 
 ## Table of Contents
@@ -710,5 +715,8 @@ Permissionless and open source. Feel free to use, modify, and distribute.
 **Built with ❤️ for decentralized computing**
 
 [Report Bug](../../issues) · [Request Feature](../../issues)
+
+<img width="1832" height="491" alt="image" src="https://github.com/user-attachments/assets/5ddf86b6-895b-4973-8198-2818f5ee65e1" />
+
 
 </div>
