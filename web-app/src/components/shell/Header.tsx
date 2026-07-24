@@ -15,11 +15,12 @@ const NAV: NavItem[] = [
   { to: "/jobs",          label: "Jobs" },
   { to: "/dashboard",     label: "Host Dashboard" },
   { to: "/token",         label: "Token" },
+  { to: "/terminal",      label: "Terminal" },
 ];
 
 export const Header: React.FC = () => {
   const location = useLocation();
-  const { account, coinBalance, connectWallet, disconnectWallet, loading } = useAppStore();
+  const { account, coinBalance, connectWallet, disconnectWallet, loading, isDemoMode } = useAppStore();
 
   const isActive = (to: string) =>
     to === "/" ? location.pathname === "/" : location.pathname.startsWith(to);
@@ -77,12 +78,16 @@ export const Header: React.FC = () => {
         <div className="flex items-center" style={{ gap: 16 }}>
           {/* Network pill */}
           <div
-            className="hidden sm:flex items-center hairline"
-            style={{ gap: 8, padding: "4px 10px" }}
+            className="hidden sm:flex items-center"
+            style={{
+              gap: 8,
+              padding: "4px 10px",
+              border: `1px solid ${isDemoMode ? "var(--c-warning)" : "var(--c-outline-variant)"}`,
+            }}
           >
-            <span className="status-dot live" />
+            <span className={`status-dot ${isDemoMode ? "warning" : "live"}`} />
             <span className="label-sm" style={{ fontSize: 10, color: "var(--c-on-surface)" }}>
-              BSC_TESTNET
+              {isDemoMode ? "DEMO_MODE" : "BSC_TESTNET"}
             </span>
           </div>
 
@@ -99,10 +104,26 @@ export const Header: React.FC = () => {
           )}
 
           {account ? (
-            <button onClick={disconnectWallet} className="btn btn-ghost btn-sm" title="Disconnect wallet">
-              <Icon name="logout" size={14} />
-              {shortAddr(account)}
-            </button>
+            <div className="flex items-center" style={{ gap: 8 }}>
+              {isDemoMode && (
+                <span
+                  className="label-sm"
+                  style={{
+                    fontSize: 9,
+                    color: "var(--c-warning)",
+                    background: "rgba(251, 191, 36, 0.1)",
+                    padding: "2px 6px",
+                    border: "1px solid rgba(251, 191, 36, 0.3)",
+                  }}
+                >
+                  DEMO
+                </span>
+              )}
+              <button onClick={disconnectWallet} className="btn btn-ghost btn-sm" title="Disconnect wallet">
+                <Icon name="logout" size={14} />
+                {shortAddr(account)}
+              </button>
+            </div>
           ) : (
             <button onClick={connectWallet} className="btn btn-primary btn-sm" disabled={loading}>
               <Icon name="link" size={14} />
