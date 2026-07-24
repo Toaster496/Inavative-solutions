@@ -30,17 +30,9 @@ jobs:
         env:
           GITHUB_PAGES: true
 
-      - name: Copy build to root
-        run: |
-          cp -r web-app/dist/* .
-          cp web-app/dist/.* . 2>/dev/null || true
-
-      - name: Add .nojekyll
-        run: touch .nojekyll
-
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .
+          publish_dir: web-app/dist
           force_orphan: true
