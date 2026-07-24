@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MODEL_LIBRARY, calculateVRAM, RESOURCE_TYPE } from '../lib/constants';
+import { MODEL_LIBRARY, calculateVRAM } from '../lib/constants';
 
 interface ModelCardProps {
   model: typeof MODEL_LIBRARY[0];
