@@ -5,13 +5,16 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
+    host: true,
+    strictPort: false
+  },
+  preview: {
+    port: 3000,
     host: true
   },
   build: {
     target: 'esnext',
-    outDir: 'dist'
-  },
-  optimizeDeps: {
-    exclude: ['libp2p']
+    outDir: 'dist',
+    sourcemap: false
   }
 })

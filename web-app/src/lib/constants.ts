@@ -166,3 +166,100 @@ export function calculateVRAM(
   
   return Math.round((baseVRAM + overhead) * 10) / 10;
 }
+
+// ----------------------------------------------------------------------------
+// Marketplace listings — illustrative catalog shown on the Marketplace page.
+// These are demo rows; real listings should come from an indexer / subgraph
+// that reads host registrations and live heartbeats from the marketplace
+// contract. Replace MARKETPLACE_LISTINGS with on-chain data when ready.
+// ----------------------------------------------------------------------------
+export interface MarketplaceListing {
+  id: string;
+  name: string;
+  hardware: string;
+  memory: string;
+  region: string;
+  pricePerHour: number;
+  online: boolean;
+  tier: 'Premium' | 'Enterprise' | 'Value' | 'Ultra_Verified' | 'Maintenance';
+  icon: string; // Material Symbols Outlined icon name
+}
+
+export const MARKETPLACE_LISTINGS: MarketplaceListing[] = [
+  { id: 'alpha-92',       name: 'Alpha-92',        hardware: 'RTX 4090 x1',  memory: '24GB GDDR6X', region: 'US-W', pricePerHour: 0.42, online: true,  tier: 'Premium',        icon: 'developer_board' },
+  { id: 'datacluster-x',  name: 'DataCluster-X',   hardware: 'A100 SXM4',    memory: '80GB HBM2e',  region: 'EU-C', pricePerHour: 1.85, online: true,  tier: 'Enterprise',     icon: 'dns' },
+  { id: 'computefarm-3',  name: 'ComputeFarm_3',   hardware: 'RTX 3090',     memory: '24GB GDDR6X', region: 'AS-E', pricePerHour: 0.25, online: true,  tier: 'Value',          icon: 'grid_view' },
+  { id: 'deeplearn-titan',name: 'DeepLearn-Titan', hardware: 'H100 80GB',    memory: '80GB HBM3',   region: 'US-E', pricePerHour: 4.10, online: true,  tier: 'Ultra_Verified', icon: 'bolt' },
+  { id: 'homeworker-7',   name: 'HomeWorker-7',    hardware: '3080 Ti',      memory: '12GB GDDR6X', region: 'CA-W', pricePerHour: 0.18, online: false, tier: 'Maintenance',    icon: 'settings_input_component' },
+  { id: 'quantum-edge',   name: 'Quantum_Edge',    hardware: 'RTX 4080',     memory: '16GB GDDR6X', region: 'EU-N', pricePerHour: 0.55, online: true,  tier: 'Premium',        icon: 'developer_board' },
+  { id: 'nebula-cluster', name: 'Nebula_Cluster',  hardware: 'A100 x2',      memory: '160GB HBM2e', region: 'US-W', pricePerHour: 3.20, online: true,  tier: 'Enterprise',     icon: 'dns' },
+  { id: 'forge-mk2',      name: 'Forge_MK2',       hardware: 'RTX 5090',     memory: '32GB GDDR7',  region: 'AS-S', pricePerHour: 0.95, online: true,  tier: 'Ultra_Verified', icon: 'bolt' }
+];
+
+// ----------------------------------------------------------------------------
+// Network stats — displayed on the Home and Token pages.
+// Mock numbers that match the wireframe; replace with on-chain reads.
+// ----------------------------------------------------------------------------
+export const NETWORK_STATS = {
+  activeNodes: 5400,
+  totalCapacityPFLOPS: 2.1,
+  avgPriceRtx3090: 0.18,
+  totalSupply: 1_000_000_000,
+  protocolFeePct: 25,
+  minHostStake: 100,
+  totalNodesActive: 1248,
+  currentEpoch: 14209,
+  vramAllocationPct: 82.4,
+  bandwidthPct: 45.1
+};
+
+// ----------------------------------------------------------------------------
+// Demo host hardware logs — shown on the Operator Console (Dashboard).
+// Real values should be reported by the desktop host daemon via heartbeats.
+// ----------------------------------------------------------------------------
+export interface HardwareLog {
+  model: string;
+  spec: string;
+  loadPct: number;
+  icon: string;
+}
+
+export const HARDWARE_LOGS: HardwareLog[] = [
+  { model: 'NVIDIA H100 Tensor Core', spec: 'PCIe Gen 5 | 80GB HBM3',  loadPct: 75, icon: 'memory' },
+  { model: 'AMD EPYC 9654',           spec: '96 Cores | 192 Threads',  loadPct: 25, icon: 'developer_board' },
+  { model: 'NVIDIA RTX 4090',         spec: '24GB GDDR6X | 16384 CUDA', loadPct: 60, icon: 'memory' }
+];
+
+// ----------------------------------------------------------------------------
+// Demo executing jobs — shown on the Operator Console (Dashboard) "Executing"
+// tab. Replace with on-chain reads via jobs(host) once the host daemon is live.
+// ----------------------------------------------------------------------------
+export interface ExecutingJob {
+  id: string;
+  label: string;
+  rateCptPerHour: number;
+  progressPct: number;
+  resultHash: string;
+  icon: string;
+}
+
+export const EXECUTING_JOBS: ExecutingJob[] = [
+  { id: 'JOB_8294_B', label: 'Llama-3 Fine-tuning', rateCptPerHour: 0.45, progressPct: 64, resultHash: '0x8f2c...41e9d20c3a8f5b1d4e2a9f0c', icon: 'settings_b_roll' },
+  { id: 'JOB_7741_A', label: 'Molecular Docking',   rateCptPerHour: 1.20, progressPct: 12, resultHash: '0xa7b1...9c2d1e0f3b4a5d6e7f8g9h', icon: 'science' },
+  { id: 'JOB_8301_C', label: 'Stable Diffusion Batch', rateCptPerHour: 0.85, progressPct: 88, resultHash: '0x3c8d...772910ab4f8e2d1c0b3a6e9d', icon: 'image' },
+  { id: 'JOB_8210_A', label: 'Whisper Transcription', rateCptPerHour: 0.30, progressPct: 38, resultHash: '0xff10...8841ace02b6d9e3a1f5c4b7e', icon: 'graphic_eq' }
+];
+
+// Helper: short-form wallet address
+export function shortAddr(addr: string | null | undefined, head = 6, tail = 4): string {
+  if (!addr) return '—';
+  if (addr.length <= head + tail + 2) return addr;
+  return `${addr.slice(0, head)}...${addr.slice(-tail)}`;
+}
+
+// Helper: convert wei bigint to CPT display string
+export function formatCpt(wei: bigint | null | undefined, dp = 2): string {
+  if (!wei) return '0.00';
+  const whole = Number(wei) / 1e18;
+  return whole.toLocaleString(undefined, { minimumFractionDigits: dp, maximumFractionDigits: dp });
+}

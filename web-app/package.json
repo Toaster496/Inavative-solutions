@@ -6,24 +6,15 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview --host --port 3000"
   },
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "ethers": "^6.9.0",
-    "libp2p": "^1.0.0",
-    "@libp2p/webrtc": "^4.0.0",
-    "@libp2p/websockets": "^8.0.0",
-    "@libp2p/mplex": "^10.0.0",
-    "wagmi": "^1.4.0",
-    "viem": "^1.21.0",
     "react-router-dom": "^6.20.0",
-    "axios": "^1.6.0",
     "zustand": "^4.4.0",
-    "recharts": "^2.10.0",
-    "crypto-js": "^4.2.0",
-    "ipfs-http-client": "^60.0.0"
+    "recharts": "^2.10.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.37",
