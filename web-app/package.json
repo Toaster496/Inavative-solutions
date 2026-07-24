@@ -12,7 +12,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "ethers": "^6.9.0",
-    "react-router-dom": "^6.20.0",
+    "react-router-dom": "^7.18.1",
     "zustand": "^4.4.0",
     "recharts": "^2.10.0"
   },
