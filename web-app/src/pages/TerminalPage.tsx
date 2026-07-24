@@ -5,9 +5,10 @@ import "@xterm/xterm/css/xterm.css";
 import { Icon } from "../components/ui/Icon";
 
 const DEMO_USER = "demo";
-const DEMO_HOST = "compute.market";
+const DEMO_HOST = "localhost";
 const DEMO_PORT = 2222;
 const DEMO_PASSWORD = "••••••••";
+const WS_URL = "ws://localhost:3001";
 
 const SSH_INFO = {
   host: DEMO_HOST,
@@ -17,9 +18,9 @@ const SSH_INFO = {
   command: `ssh ${DEMO_USER}@${DEMO_HOST} -p ${DEMO_PORT}`,
 };
 
-const WELCOME_LINES = [
+const WELCOME_LINES_SIM = [
   "\x1b[32mWelcome to ComputeMarket Demo SSH Terminal\x1b[0m",
-  "\x1b[33mThis is a simulated demo environment. No real SSH connection is established.\x1b[0m",
+  "\x1b[33m[Simulated Mode] No real SSH connection available.\x1b[0m",
   "",
   `Connected to \x1b[36m${DEMO_HOST}\x1b[0m via port \x1b[36m${DEMO_PORT}\x1b[0m`,
   "Authenticated as \x1b[36m" + DEMO_USER + "\x1b[0m",
@@ -176,8 +177,10 @@ const TerminalPage: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const terminalRef = useRef<Terminal | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
+  const wsRef = useRef<WebSocket | null>(null);
   const [connected, setConnected] = useState(false);
-  const bufferRef = useRef<string>("");
+  const [mode, setMode] = useState<"ws" | "sim">("sim");
+  const simBufferRef = useRef<string>("");
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -225,66 +228,127 @@ const TerminalPage: React.FC = () => {
     });
     resizeObserver.observe(containerRef.current);
 
-    term.onKey((e) => {
-      const { key, domEvent } = e;
+    // Try WebSocket connection for real shell
+    let useSim = true;
+    try {
+      const ws = new WebSocket(WS_URL);
+      wsRef.current = ws;
+
+      ws.onopen = () => {
+        useSim = false;
+        setMode("ws");
+        setConnected(true);
+      };
+
+      ws.onmessage = (event) => {
+        term.write(event.data);
+      };
+
+      ws.onerror = () => {
+        useSim = true;
+        startSimMode(term);
+      };
+
+      ws.onclose = () => {
+        if (!useSim) {
+          term.writeln("\r\n\x1b[33m[WebSocket connection closed]\x1b[0m");
+          startSimMode(term);
+        }
+      };
+
+      // In WS mode, forward all key input
+      term.onKey((e) => {
+        if (!useSim && ws.readyState === WebSocket.OPEN) {
+          ws.send(e.key);
+        } else if (useSim) {
+          handleSimKey(e.domEvent, e.key, term);
+        }
+      });
+    } catch (e) {
+      startSimMode(term);
+    }
+
+    // Fallback timer to switch to sim if WS doesn't connect
+    const fallbackTimer = setTimeout(() => {
+      if (useSim && mode === "sim" && !connected) {
+        startSimMode(term);
+      }
+    }, 3000);
+
+    function startSimMode(t: Terminal) {
+      if (!useSim) return;
+      useSim = true;
+      setMode("sim");
+      let lineIdx = 0;
+      const typeLine = () => {
+        if (lineIdx < WELCOME_LINES_SIM.length) {
+          const line = WELCOME_LINES_SIM[lineIdx];
+          t.writeln(line);
+          lineIdx++;
+          setTimeout(typeLine, Math.random() * 60 + 20);
+        } else {
+          setConnected(true);
+          t.write(PROMPT + " ");
+        }
+      };
+      typeLine();
+
+      // Re-bind keys for sim mode
+      t.onKey((e) => {
+        handleSimKey(e.domEvent, e.key, t);
+      });
+    }
+
+    function handleSimKey(domEvent: KeyboardEvent, key: string, t: Terminal) {
+      const buf = simBufferRef;
 
       if (domEvent.key === "Enter") {
-        const input = bufferRef.current.trim();
-        term.write("\r\n");
-        handleCommand(input, term);
-        bufferRef.current = "";
+        const input = buf.current.trim();
+        t.write("\r\n");
+        handleCommand(input, t);
+        buf.current = "";
       } else if (domEvent.key === "Backspace") {
-        if (bufferRef.current.length > 0) {
-          bufferRef.current = bufferRef.current.slice(0, -1);
-          term.write("\b \b");
+        if (buf.current.length > 0) {
+          buf.current = buf.current.slice(0, -1);
+          t.write("\b \b");
         }
       } else if (domEvent.key === "ArrowUp") {
         if (cmdHistory.length > 0) {
           const newIdx = Math.max(0, cmdHistoryIdx - 1);
           cmdHistoryIdx = newIdx;
           const cmd = cmdHistory[newIdx];
-          term.write("\r\x1b[K" + PROMPT + " " + cmd);
-          bufferRef.current = cmd;
+          t.write("\r\x1b[K" + PROMPT + " " + cmd);
+          buf.current = cmd;
         }
       } else if (domEvent.key === "ArrowDown") {
         if (cmdHistoryIdx < cmdHistory.length - 1) {
           const newIdx = cmdHistoryIdx + 1;
           cmdHistoryIdx = newIdx;
           const cmd = cmdHistory[newIdx];
-          term.write("\r\x1b[K" + PROMPT + " " + cmd);
-          bufferRef.current = cmd;
+          t.write("\r\x1b[K" + PROMPT + " " + cmd);
+          buf.current = cmd;
         } else {
           cmdHistoryIdx = cmdHistory.length;
-          term.write("\r\x1b[K" + PROMPT + " ");
-          bufferRef.current = "";
+          t.write("\r\x1b[K" + PROMPT + " ");
+          buf.current = "";
         }
       } else if (domEvent.key === "Tab") {
         domEvent.preventDefault();
       } else if (domEvent.key === "c" && (domEvent.ctrlKey || domEvent.metaKey)) {
-        term.write("^C\r\n" + PROMPT + " ");
-        bufferRef.current = "";
+        t.write("^C\r\n" + PROMPT + " ");
+        buf.current = "";
       } else if (domEvent.key.length === 1) {
-        bufferRef.current += key;
-        term.write(key);
+        buf.current += key;
+        t.write(key);
       }
-    });
-
-    let lineIdx = 0;
-    const typeLine = () => {
-      if (lineIdx < WELCOME_LINES.length) {
-        const line = WELCOME_LINES[lineIdx];
-        term.writeln(line);
-        lineIdx++;
-        setTimeout(typeLine, Math.random() * 60 + 20);
-      } else {
-        setConnected(true);
-        term.write(PROMPT + " ");
-      }
-    };
-    typeLine();
+    }
 
     return () => {
+      clearTimeout(fallbackTimer);
       resizeObserver.disconnect();
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
       term.dispose();
     };
   }, []);
@@ -312,7 +376,7 @@ const TerminalPage: React.FC = () => {
         <div className="flex items-center" style={{ gap: 8 }}>
           <span className={`status-dot ${connected ? "live" : "offline"}`} />
           <span className="label-sm" style={{ fontSize: 10, color: connected ? "var(--c-primary)" : "var(--c-on-surface-variant)" }}>
-            {connected ? "CONNECTED" : "CONNECTING..."}
+            {connected ? (mode === "ws" ? "REAL_SSH" : "SIMULATED") : "CONNECTING..."}
           </span>
         </div>
       </div>
@@ -481,7 +545,7 @@ const SSHInfoPanel: React.FC = () => {
           The external SSH gateway runs on port {SSH_INFO.port} and auto-authenticates demo users.
           <br /><br />
           <span className="text-warning">
-            Note: This is a simulated environment. External SSH connections are not active.
+            Note: External SSH connections work when the server is running (node server/start.js).
           </span>
         </p>
       </div>

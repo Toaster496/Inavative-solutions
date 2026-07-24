@@ -57,7 +57,7 @@ export const DemoBanner: React.FC = () => {
           paddingLeft: 12,
         }}
       >
-        SSH: demo@compute.market:2222
+        SSH: ssh demo@localhost -p 2222
       </span>
       <button
         onClick={() => setDismissed(true)}

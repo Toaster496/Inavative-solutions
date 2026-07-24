@@ -5,6 +5,7 @@ import {
   COMPUTE_COIN_ABI,
   MARKETPLACE_ABI,
 } from "../lib/constants";
+import type { MarketplaceListing } from "../lib/constants";
 
 export interface Job {
   id: number;
@@ -37,6 +38,22 @@ export interface Host {
   gpuCount: bigint;
   cpuCores: bigint;
   ramGB: bigint;
+}
+
+export interface Rental {
+  id: string;
+  listingId: string;
+  listingName: string;
+  hardware: string;
+  memory: string;
+  region: string;
+  tier: string;
+  pricePerHour: number;
+  hours: number;
+  totalCost: number;
+  startedAt: number;
+  endedAt: number | null;
+  status: 'active' | 'terminated';
 }
 
 interface CreateJobParams {
@@ -128,6 +145,7 @@ interface AppState {
   isHost: boolean;
   hostInfo: Host | null;
   jobs: Job[];
+  rentals: Rental[];
   loading: boolean;
   error: string | null;
   isDemoMode: boolean;
@@ -144,6 +162,8 @@ interface AppState {
   fetchJobs: () => Promise<void>;
   checkHostStatus: () => Promise<void>;
   clearError: () => void;
+  rentGpu: (listing: MarketplaceListing, hours: number) => Promise<void>;
+  terminateRental: (rentalId: string) => Promise<void>;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -154,6 +174,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   isHost: false,
   hostInfo: null,
   jobs: [],
+  rentals: [],
   loading: false,
   error: null,
   isDemoMode: false,
@@ -491,4 +512,58 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   clearError: () => set({ error: null }),
+
+  rentGpu: async (listing: MarketplaceListing, hours: number) => {
+    const { coinBalance } = get();
+    if (!coinBalance) throw new Error("Wallet not connected");
+
+    const cost = listing.pricePerHour * hours;
+    const costWei = ethers.parseEther(cost.toFixed(18));
+
+    if (coinBalance < costWei) {
+      throw new Error(`Insufficient balance. Need ${cost.toFixed(2)} CPT`);
+    }
+
+    const rental: Rental = {
+      id: `RENT_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      listingId: listing.id,
+      listingName: listing.name,
+      hardware: listing.hardware,
+      memory: listing.memory,
+      region: listing.region,
+      tier: listing.tier,
+      pricePerHour: listing.pricePerHour,
+      hours,
+      totalCost: cost,
+      startedAt: Date.now(),
+      endedAt: null,
+      status: 'active',
+    };
+
+    set({
+      rentals: [rental, ...get().rentals],
+      coinBalance: coinBalance - costWei,
+    });
+  },
+
+  terminateRental: async (rentalId: string) => {
+    const { rentals } = get();
+    const rental = rentals.find((r) => r.id === rentalId);
+    if (!rental) throw new Error("Rental not found");
+    if (rental.status !== 'active') throw new Error("Rental is not active");
+
+    const elapsedHours = (Date.now() - rental.startedAt) / 3600000;
+    const usedCost = rental.pricePerHour * Math.min(elapsedHours, rental.hours);
+    const refund = Math.max(0, rental.totalCost - usedCost);
+    const refundWei = ethers.parseEther(refund.toFixed(18));
+
+    set({
+      rentals: rentals.map((r) =>
+        r.id === rentalId
+          ? { ...r, status: 'terminated' as const, endedAt: Date.now() }
+          : r
+      ),
+      coinBalance: get().coinBalance! + refundWei,
+    });
+  },
 }));

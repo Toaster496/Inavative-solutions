@@ -193,7 +193,32 @@ export const MARKETPLACE_LISTINGS: MarketplaceListing[] = [
   { id: 'homeworker-7',   name: 'HomeWorker-7',    hardware: '3080 Ti',      memory: '12GB GDDR6X', region: 'CA-W', pricePerHour: 0.18, online: false, tier: 'Maintenance',    icon: 'settings_input_component' },
   { id: 'quantum-edge',   name: 'Quantum_Edge',    hardware: 'RTX 4080',     memory: '16GB GDDR6X', region: 'EU-N', pricePerHour: 0.55, online: true,  tier: 'Premium',        icon: 'developer_board' },
   { id: 'nebula-cluster', name: 'Nebula_Cluster',  hardware: 'A100 x2',      memory: '160GB HBM2e', region: 'US-W', pricePerHour: 3.20, online: true,  tier: 'Enterprise',     icon: 'dns' },
-  { id: 'forge-mk2',      name: 'Forge_MK2',       hardware: 'RTX 5090',     memory: '32GB GDDR7',  region: 'AS-S', pricePerHour: 0.95, online: true,  tier: 'Ultra_Verified', icon: 'bolt' }
+  { id: 'forge-mk2',      name: 'Forge_MK2',       hardware: 'RTX 5090',     memory: '32GB GDDR7',  region: 'AS-S', pricePerHour: 0.95, online: true,  tier: 'Ultra_Verified', icon: 'bolt' },
+  { id: 'node-3060-a',    name: 'BudgetRig_01',    hardware: 'RTX 3060',     memory: '12GB GDDR6',  region: 'US-W', pricePerHour: 0.08, online: true,  tier: 'Value',          icon: 'developer_board' },
+  { id: 'node-3070-b',    name: 'PixelForge_1',    hardware: 'RTX 3070',     memory: '8GB GDDR6',   region: 'EU-W', pricePerHour: 0.12, online: true,  tier: 'Value',          icon: 'grid_view' },
+  { id: 'node-4060-c',    name: 'TensorPond',      hardware: 'RTX 4060 Ti',  memory: '16GB GDDR6',  region: 'AS-E', pricePerHour: 0.15, online: true,  tier: 'Value',          icon: 'grid_view' },
+  { id: 'node-4070-d',    name: 'MatrixCore_7',    hardware: 'RTX 4070',     memory: '12GB GDDR6X', region: 'US-E', pricePerHour: 0.22, online: true,  tier: 'Value',          icon: 'developer_board' },
+  { id: 'node-4070s-e',   name: 'Zephyr_Compute',  hardware: 'RTX 4070 Super', memory: '12GB GDDR6X', region: 'EU-N', pricePerHour: 0.25, online: true,  tier: 'Premium',        icon: 'developer_board' },
+  { id: 'node-4070ti-f',  name: 'AetherNode',      hardware: 'RTX 4070 Ti Super', memory: '16GB GDDR6X', region: 'EU-C', pricePerHour: 0.28, online: true,  tier: 'Premium',        icon: 'developer_board' },
+  { id: 'node-3080-g',    name: 'Inferno_Rack',    hardware: 'RTX 3080',     memory: '10GB GDDR6X', region: 'AS-S', pricePerHour: 0.20, online: true,  tier: 'Value',          icon: 'grid_view' },
+  { id: 'node-3090ti-h',  name: 'SambaNode',       hardware: 'RTX 3090 Ti',  memory: '24GB GDDR6X', region: 'SA-BR', pricePerHour: 0.32, online: true,  tier: 'Premium',        icon: 'developer_board' },
+  { id: 'node-4080s-i',   name: 'Cascade_GPU',     hardware: 'RTX 4080 Super', memory: '16GB GDDR6X', region: 'EU-W', pricePerHour: 0.48, online: true,  tier: 'Premium',        icon: 'developer_board' },
+  { id: 'node-4060d-j',   name: 'DualPixel_4060',  hardware: 'RTX 4060 x2',  memory: '16GB GDDR6',  region: 'CA-W', pricePerHour: 0.28, online: true,  tier: 'Value',          icon: 'grid_view' },
+  { id: 'node-3060-12k',  name: 'EcoNode_12G',     hardware: 'RTX 3060 12GB', memory: '12GB GDDR6', region: 'SA-BR', pricePerHour: 0.08, online: true,  tier: 'Value',          icon: 'developer_board' },
+  { id: 'node-2080ti-l',  name: 'LegacyRack_2080', hardware: 'RTX 2080 Ti',  memory: '11GB GDDR6',  region: 'EU-W', pricePerHour: 0.14, online: true,  tier: 'Value',          icon: 'grid_view' },
+  { id: 'node-a40-m',     name: 'A40_Cluster',     hardware: 'A40 48GB',     memory: '48GB GDDR6',  region: 'US-E', pricePerHour: 1.10, online: true,  tier: 'Enterprise',     icon: 'dns' },
+  { id: 'node-l40s-n',    name: 'L40S_Node',       hardware: 'L40S 48GB',    memory: '48GB GDDR6',  region: 'EU-C', pricePerHour: 1.75, online: true,  tier: 'Enterprise',     icon: 'dns' },
+  { id: 'node-l4-o',      name: 'L4_Edge',         hardware: 'NVIDIA L4',    memory: '24GB GDDR6',  region: 'AS-SE', pricePerHour: 0.65, online: true,  tier: 'Enterprise',     icon: 'dns' },
+  { id: 'node-a2-p',      name: 'A2_UltraLight',   hardware: 'NVIDIA A2',    memory: '16GB GDDR6',  region: 'AU-E', pricePerHour: 0.22, online: true,  tier: 'Value',          icon: 'developer_board' },
+  { id: 'node-mi300x-q',  name: 'MI300X_Cluster',  hardware: 'AMD MI300X',   memory: '192GB HBM3',  region: 'AS-E', pricePerHour: 2.40, online: true,  tier: 'Enterprise',     icon: 'dns' },
+  { id: 'node-a100-40-r', name: 'A100_40GB_Core',  hardware: 'A100 40GB',    memory: '40GB HBM2e',  region: 'US-W', pricePerHour: 1.20, online: true,  tier: 'Enterprise',     icon: 'dns' },
+  { id: 'node-a100d-s',   name: 'A100_Duo_West',   hardware: 'A100 80GB x2', memory: '160GB HBM2e', region: 'EU-N', pricePerHour: 3.50, online: true,  tier: 'Enterprise',     icon: 'dns' },
+  { id: 'node-h100q-t',   name: 'H100_Quad_US',    hardware: 'H100 80GB x4', memory: '320GB HBM3',  region: 'US-E', pricePerHour: 14.00, online: true,  tier: 'Ultra_Verified', icon: 'bolt' },
+  { id: 'node-5090d-u',   name: 'Forge_Duo_MK2',   hardware: 'RTX 5090 x2',  memory: '64GB GDDR7',  region: 'AS-S', pricePerHour: 1.80, online: true,  tier: 'Ultra_Verified', icon: 'bolt' },
+  { id: 'node-h100n-v',   name: 'H100_NVL_Node',   hardware: 'H100 NVL 94GB', memory: '188GB HBM3', region: 'US-W', pricePerHour: 6.20, online: true,  tier: 'Ultra_Verified', icon: 'bolt' },
+  { id: 'node-4090q-w',   name: 'Alpha_Quad_4090', hardware: 'RTX 4090 x4',  memory: '96GB GDDR6X', region: 'US-W', pricePerHour: 1.60, online: true,  tier: 'Enterprise',     icon: 'dns' },
+  { id: 'node-a100o-x',   name: 'A100_Octo_Max',   hardware: 'A100 80GB x8', memory: '640GB HBM2e', region: 'US-E', pricePerHour: 14.80, online: true,  tier: 'Ultra_Verified', icon: 'bolt' },
+  { id: 'node-4060l-y',   name: 'Laptop_4060_Rig', hardware: 'RTX 4060 Laptop', memory: '8GB GDDR6', region: 'AU-E', pricePerHour: 0.10, online: true,  tier: 'Value',          icon: 'developer_board' }
 ];
 
 // ----------------------------------------------------------------------------
