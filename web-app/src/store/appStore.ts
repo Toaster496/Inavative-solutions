@@ -41,8 +41,8 @@ export interface Host {
 
 interface CreateJobParams {
   jobSpec: string;
-  price: string; // CPT, human-readable (e.g. "1.50")
-  resourceType?: number; // 0 = GPU, 1 = CPU, 2 = RAM
+  price: string;
+  resourceType?: number;
   gpuCount?: number;
   contextLength?: number;
 }
@@ -56,6 +56,70 @@ interface RegisterHostParams {
   cpuOnly?: boolean;
 }
 
+const DEMO_ACCOUNT = "0xDemo4f6e5A3a2D1cB7a889bF9c8d0Ef12345678AbCd";
+const DEMO_BALANCE = ethers.parseEther("25000");
+const DEMO_HOST_ADDR = "0xDemoB4d5e6F7a8b9C0d1E2f3A4b5C6d7E8f9A0b1C2";
+
+function makeDemoJob(
+  id: number,
+  status: number,
+  overrides?: Partial<Job>
+): Job {
+  return {
+    id,
+    client: DEMO_ACCOUNT,
+    host: status === 0 ? ethers.ZeroAddress : DEMO_HOST_ADDR,
+    jobSpec: [
+      "Llama-3 8B fine-tuning on custom dataset",
+      "Stable Diffusion XL batch generation (1024x1024)",
+      "Whisper large-v3 transcription job",
+      "Molecular docking simulation (AutoDock Vina)",
+      "Blender Cycles render — 4K animation frames",
+      "TensorFlow distributed training — ResNet-50",
+    ][id % 6],
+    price: ethers.parseEther(String([0.85, 1.2, 0.45, 2.1, 3.5, 0.6][id % 6])),
+    stake: ethers.parseEther("10"),
+    status,
+    createdAt: BigInt(Math.floor(Date.now() / 1000) - (id + 1) * 3600),
+    completedAt: status >= 3 ? BigInt(Math.floor(Date.now() / 1000) - id * 600) : BigInt(0),
+    resultHash: status >= 3 ? `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join("")}` : "",
+    resourceType: [0, 0, 1, 0, 0, 1][id % 6],
+    gpuCount: BigInt([1, 2, 0, 4, 1, 0][id % 6]),
+    contextLength: BigInt([4096, 8192, 0, 32768, 0, 0][id % 6]),
+    isBatchJob: false,
+    batchParentId: BigInt(0),
+    ...overrides,
+  };
+}
+
+const DEMO_JOBS: Job[] = [
+  makeDemoJob(1, 0, { client: "0xClientA3b2C1d4E5f6A7b8C9d0E1f2A3b4C5d6E7f8A9" }),
+  makeDemoJob(2, 0, { client: "0xClientB9c8D7e6F5a4B3c2D1e0F9a8B7c6D5e4F3a2B1" }),
+  makeDemoJob(3, 1, { host: DEMO_HOST_ADDR }),
+  makeDemoJob(4, 2, { host: DEMO_HOST_ADDR }),
+  makeDemoJob(5, 3, { host: DEMO_HOST_ADDR }),
+  makeDemoJob(6, 4),
+  makeDemoJob(7, 5),
+  makeDemoJob(8, 6),
+  makeDemoJob(9, 0, { client: "0xClientC7d8E9f0A1b2C3d4E5f6A7b8C9d0E1f2A3b4C5" }),
+  makeDemoJob(10, 1, { host: DEMO_HOST_ADDR }),
+];
+
+const DEMO_HOST_INFO: Host = {
+  registered: true,
+  stake: ethers.parseEther("500"),
+  reputation: BigInt(92),
+  completedJobs: BigInt(47),
+  nodeInfo: "/ip4/192.168.1.42/tcp/4001/p2p/12D3KooWDemoHostNodeId123456789abc",
+  uptimeStart: BigInt(Math.floor(Date.now() / 1000) - 86400 * 14),
+  totalUptime: BigInt(86400 * 12),
+  lastHeartbeat: BigInt(Math.floor(Date.now() / 1000) - 120),
+  isCpuOnly: false,
+  gpuCount: BigInt(2),
+  cpuCores: BigInt(16),
+  ramGB: BigInt(64),
+};
+
 interface AppState {
   provider: ethers.BrowserProvider | null;
   signer: ethers.Signer | null;
@@ -66,9 +130,10 @@ interface AppState {
   jobs: Job[];
   loading: boolean;
   error: string | null;
+  isDemoMode: boolean;
 
-  // Actions
   connectWallet: () => Promise<void>;
+  connectDemoWallet: () => void;
   disconnectWallet: () => void;
   refreshBalance: () => Promise<void>;
   createJob: (params: CreateJobParams) => Promise<number>;
@@ -91,21 +156,19 @@ export const useAppStore = create<AppState>((set, get) => ({
   jobs: [],
   loading: false,
   error: null,
+  isDemoMode: false,
 
   connectWallet: async () => {
     try {
       set({ loading: true, error: null });
-
       if (!window.ethereum) {
-        throw new Error("Please install MetaMask or a compatible wallet");
+        get().connectDemoWallet();
+        return;
       }
-
       const provider = new ethers.BrowserProvider(window.ethereum as any);
       await provider.send("eth_requestAccounts", []);
       const signer = await provider.getSigner();
       const account = await signer.getAddress();
-
-      // Check chain ID
       const network = await provider.getNetwork();
       if (Number(network.chainId) !== CONTRACTS.chainId) {
         try {
@@ -115,21 +178,35 @@ export const useAppStore = create<AppState>((set, get) => ({
           });
         } catch (switchError: any) {
           if (switchError.code === 4902) {
-            throw new Error("Please add BSC Testnet to your wallet");
+            set({ error: "Please add BSC Testnet to your wallet. Falling back to demo mode." });
+            get().connectDemoWallet();
+            return;
           }
           throw switchError;
         }
       }
-
-      set({ provider, signer, account });
+      set({ provider, signer, account, isDemoMode: false });
       await get().refreshBalance();
       await get().checkHostStatus();
       await get().fetchJobs();
     } catch (err: any) {
-      set({ error: err.message || "Failed to connect wallet" });
+      set({ error: err.message || "Failed to connect. Falling back to demo mode." });
+      get().connectDemoWallet();
     } finally {
       set({ loading: false });
     }
+  },
+
+  connectDemoWallet: () => {
+    set({
+      account: DEMO_ACCOUNT,
+      coinBalance: DEMO_BALANCE,
+      isHost: true,
+      hostInfo: DEMO_HOST_INFO,
+      jobs: DEMO_JOBS,
+      isDemoMode: true,
+      error: null,
+    });
   },
 
   disconnectWallet: () => {
@@ -142,19 +219,19 @@ export const useAppStore = create<AppState>((set, get) => ({
       hostInfo: null,
       jobs: [],
       error: null,
+      isDemoMode: false,
     });
   },
 
   refreshBalance: async () => {
-    const { provider, account } = get();
+    const { provider, account, isDemoMode } = get();
+    if (isDemoMode) {
+      set({ coinBalance: DEMO_BALANCE });
+      return;
+    }
     if (!provider || !account) return;
-
     try {
-      const coinContract = new ethers.Contract(
-        CONTRACTS.computeCoin,
-        COMPUTE_COIN_ABI,
-        provider
-      );
+      const coinContract = new ethers.Contract(CONTRACTS.computeCoin, COMPUTE_COIN_ABI, provider);
       const balance = await coinContract.balanceOf(account);
       set({ coinBalance: balance });
     } catch (err: any) {
@@ -163,57 +240,34 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   createJob: async (params: CreateJobParams) => {
-    const { signer, account } = get();
-    if (!signer || !account) throw new Error("Wallet not connected");
+    const { isDemoMode, signer, account } = get();
+    if (!account) throw new Error("Wallet not connected");
 
+    if (isDemoMode) {
+      const newId = Math.max(0, ...get().jobs.map((j) => j.id)) + 1;
+      const newJob = makeDemoJob(newId, 0, { client: account, jobSpec: params.jobSpec });
+      set({ jobs: [newJob, ...get().jobs], coinBalance: DEMO_BALANCE - ethers.parseEther(params.price) });
+      return newId;
+    }
+
+    if (!signer) throw new Error("Wallet not connected");
     try {
       set({ loading: true, error: null });
-
-      const coinContract = new ethers.Contract(
-        CONTRACTS.computeCoin,
-        COMPUTE_COIN_ABI,
-        signer
-      );
-      const marketplaceContract = new ethers.Contract(
-        CONTRACTS.marketplace,
-        MARKETPLACE_ABI,
-        signer
-      );
-
+      const coinContract = new ethers.Contract(CONTRACTS.computeCoin, COMPUTE_COIN_ABI, signer);
+      const marketplaceContract = new ethers.Contract(CONTRACTS.marketplace, MARKETPLACE_ABI, signer);
       const priceWei = ethers.parseEther(params.price);
-      const resourceType = params.resourceType ?? 0;
-      const gpuCount = params.gpuCount ?? 1;
-      const contextLength = params.contextLength ?? 4096;
-
-      // Approve token transfer (marketplace will pull `priceWei` as escrow)
       const approveTx = await coinContract.approve(CONTRACTS.marketplace, priceWei);
       await approveTx.wait();
-
-      // Create job — full signature per MARKETPLACE_ABI
       const createTx = await marketplaceContract.createJob(
-        params.jobSpec,
-        priceWei,
-        resourceType,
-        gpuCount,
-        contextLength
+        params.jobSpec, priceWei, params.resourceType ?? 0, params.gpuCount ?? 1, params.contextLength ?? 4096
       );
       const receipt = await createTx.wait();
-
-      // Find JobCreated event
       const event = receipt?.logs.find((log: any) => {
-        try {
-          const parsed = marketplaceContract.interface.parseLog(log);
-          return parsed?.name === "JobCreated";
-        } catch {
-          return false;
-        }
+        try { return marketplaceContract.interface.parseLog(log)?.name === "JobCreated"; } catch { return false; }
       });
-
       const jobId = event ? Number(event.args[0]) : 0;
-
       await get().fetchJobs();
       await get().refreshBalance();
-
       return jobId;
     } catch (err: any) {
       set({ error: err.reason || err.message || "Failed to create job" });
@@ -224,20 +278,23 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   acceptJob: async (jobId: number) => {
-    const { signer } = get();
-    if (!signer) throw new Error("Wallet not connected");
+    const { isDemoMode, signer, account } = get();
+    if (!account) throw new Error("Wallet not connected");
 
+    if (isDemoMode) {
+      const updated = get().jobs.map((j) =>
+        j.id === jobId ? { ...j, status: 1, host: account } : j
+      );
+      set({ jobs: updated });
+      return;
+    }
+
+    if (!signer) throw new Error("Wallet not connected");
     try {
       set({ loading: true, error: null });
-      const marketplaceContract = new ethers.Contract(
-        CONTRACTS.marketplace,
-        MARKETPLACE_ABI,
-        signer
-      );
-
+      const marketplaceContract = new ethers.Contract(CONTRACTS.marketplace, MARKETPLACE_ABI, signer);
       const tx = await marketplaceContract.acceptJob(jobId);
       await tx.wait();
-
       await get().fetchJobs();
     } catch (err: any) {
       set({ error: err.reason || err.message || "Failed to accept job" });
@@ -248,29 +305,29 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   completeJob: async (jobId: number, resultHash: string) => {
-    const { signer } = get();
-    if (!signer) throw new Error("Wallet not connected");
+    const { isDemoMode, signer, account } = get();
+    if (!account) throw new Error("Wallet not connected");
 
+    if (isDemoMode) {
+      const updated = get().jobs.map((j) =>
+        j.id === jobId ? { ...j, status: 3, resultHash: resultHash || `0x${"ab".repeat(32)}` } : j
+      );
+      set({ jobs: updated, coinBalance: get().coinBalance! + ethers.parseEther("0.5") });
+      return;
+    }
+
+    if (!signer) throw new Error("Wallet not connected");
     try {
       set({ loading: true, error: null });
-      const marketplaceContract = new ethers.Contract(
-        CONTRACTS.marketplace,
-        MARKETPLACE_ABI,
-        signer
-      );
-
-      // Accept either 0x-prefixed hex or arbitrary string; convert to bytes32
+      const marketplaceContract = new ethers.Contract(CONTRACTS.marketplace, MARKETPLACE_ABI, signer);
       let hashBytes: string;
       if (resultHash.startsWith("0x") && resultHash.length === 66) {
         hashBytes = resultHash;
       } else {
-        // Hash arbitrary string into bytes32 via keccak256
         hashBytes = ethers.id(resultHash);
       }
-
       const tx = await marketplaceContract.completeJob(jobId, hashBytes);
       await tx.wait();
-
       await get().fetchJobs();
       await get().refreshBalance();
     } catch (err: any) {
@@ -282,52 +339,48 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   registerHost: async (params: RegisterHostParams) => {
-    const { signer } = get();
-    if (!signer) throw new Error("Wallet not connected");
+    const { isDemoMode, signer, account } = get();
+    if (!account) throw new Error("Wallet not connected");
 
+    if (isDemoMode) {
+      const newHost: Host = {
+        registered: true,
+        stake: ethers.parseEther("100"),
+        reputation: BigInt(50),
+        completedJobs: BigInt(0),
+        nodeInfo: params.nodeInfo,
+        uptimeStart: BigInt(Math.floor(Date.now() / 1000)),
+        totalUptime: BigInt(0),
+        lastHeartbeat: BigInt(Math.floor(Date.now() / 1000)),
+        isCpuOnly: params.cpuOnly ?? false,
+        gpuCount: BigInt(params.gpuCount ?? 1),
+        cpuCores: BigInt(params.cpuCores ?? 8),
+        ramGB: BigInt(params.ramGB ?? 16),
+      };
+      set({ isHost: true, hostInfo: newHost, coinBalance: get().coinBalance! - ethers.parseEther("100") });
+      return;
+    }
+
+    if (!signer) throw new Error("Wallet not connected");
     try {
       set({ loading: true, error: null });
-
-      const coinContract = new ethers.Contract(
-        CONTRACTS.computeCoin,
-        COMPUTE_COIN_ABI,
-        signer
-      );
-      const marketplaceContract = new ethers.Contract(
-        CONTRACTS.marketplace,
-        MARKETPLACE_ABI,
-        signer
-      );
-
-      // Determine stake threshold to approve
+      const coinContract = new ethers.Contract(CONTRACTS.computeCoin, COMPUTE_COIN_ABI, signer);
+      const marketplaceContract = new ethers.Contract(CONTRACTS.marketplace, MARKETPLACE_ABI, signer);
       const isCpuOnly = params.cpuOnly ?? false;
       const minStake = isCpuOnly
         ? await marketplaceContract.MIN_CPU_STAKE()
         : await marketplaceContract.MIN_HOST_STAKE();
-
-      // Approve token transfer for stake
       const approveTx = await coinContract.approve(CONTRACTS.marketplace, minStake);
       await approveTx.wait();
-
-      // Register host — pick the right entrypoint based on cpuOnly flag
       let registerTx;
       if (isCpuOnly) {
-        registerTx = await marketplaceContract.registerCpuHost(
-          params.nodeInfo,
-          params.cpuCores ?? 4,
-          params.ramGB ?? 8
-        );
+        registerTx = await marketplaceContract.registerCpuHost(params.nodeInfo, params.cpuCores ?? 4, params.ramGB ?? 8);
       } else {
         registerTx = await marketplaceContract.registerHost(
-          params.nodeInfo,
-          params.gpuIds ?? ["GPU-0"],
-          params.gpuCount ?? 1,
-          params.cpuCores ?? 8,
-          params.ramGB ?? 16
+          params.nodeInfo, params.gpuIds ?? ["GPU-0"], params.gpuCount ?? 1, params.cpuCores ?? 8, params.ramGB ?? 16
         );
       }
       await registerTx.wait();
-
       await get().checkHostStatus();
       await get().refreshBalance();
     } catch (err: any) {
@@ -339,16 +392,23 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   submitHeartbeat: async () => {
-    const { signer } = get();
-    if (!signer) throw new Error("Wallet not connected");
+    const { isDemoMode, signer, hostInfo } = get();
 
+    if (isDemoMode && hostInfo) {
+      set({
+        hostInfo: {
+          ...hostInfo,
+          lastHeartbeat: BigInt(Math.floor(Date.now() / 1000)),
+          totalUptime: hostInfo.totalUptime + BigInt(300),
+        },
+      });
+      return;
+    }
+
+    if (!signer) throw new Error("Wallet not connected");
     try {
       set({ loading: true, error: null });
-      const marketplaceContract = new ethers.Contract(
-        CONTRACTS.marketplace,
-        MARKETPLACE_ABI,
-        signer
-      );
+      const marketplaceContract = new ethers.Contract(CONTRACTS.marketplace, MARKETPLACE_ABI, signer);
       const tx = await marketplaceContract.submitHeartbeat();
       await tx.wait();
       await get().checkHostStatus();
@@ -361,28 +421,22 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   fetchJobs: async () => {
-    const { provider } = get();
+    const { isDemoMode, provider } = get();
+
+    if (isDemoMode) {
+      return;
+    }
+
     if (!provider) return;
-
     try {
-      const marketplaceContract = new ethers.Contract(
-        CONTRACTS.marketplace,
-        MARKETPLACE_ABI,
-        provider
-      );
+      const marketplaceContract = new ethers.Contract(CONTRACTS.marketplace, MARKETPLACE_ABI, provider);
       const jobCounter = await marketplaceContract.jobCounter();
-
       const count = Number(jobCounter);
-      if (count === 0) {
-        set({ jobs: [] });
-        return;
-      }
-
+      if (count === 0) { set({ jobs: [] }); return; }
       const jobsPromises = [];
       for (let i = 1; i <= count; i++) {
         jobsPromises.push(marketplaceContract.jobs(i));
       }
-
       const jobsData = await Promise.all(jobsPromises);
       const jobs: Job[] = jobsData.map((job: any, index: number) => ({
         id: index + 1,
@@ -401,25 +455,19 @@ export const useAppStore = create<AppState>((set, get) => ({
         isBatchJob: job.isBatchJob,
         batchParentId: job.batchParentId,
       }));
-
-      set({ jobs: jobs.reverse() }); // newest first
+      set({ jobs: jobs.reverse() });
     } catch (err: any) {
       console.error("Failed to fetch jobs:", err);
     }
   },
 
   checkHostStatus: async () => {
-    const { provider, account } = get();
+    const { isDemoMode, provider, account } = get();
+    if (isDemoMode) return;
     if (!provider || !account) return;
-
     try {
-      const marketplaceContract = new ethers.Contract(
-        CONTRACTS.marketplace,
-        MARKETPLACE_ABI,
-        provider
-      );
+      const marketplaceContract = new ethers.Contract(CONTRACTS.marketplace, MARKETPLACE_ABI, provider);
       const hostInfo = await marketplaceContract.getHostInfo(account);
-
       set({
         isHost: hostInfo.registered,
         hostInfo: {

@@ -16,6 +16,7 @@ const NAV: SidebarItem[] = [
   { to: "/jobs",        label: "JOBS",         icon: "memory" },
   { to: "/dashboard",   label: "HOST_DASH",    icon: "monitoring" },
   { to: "/token",       label: "TOKEN",        icon: "token" },
+  { to: "/terminal",    label: "TERMINAL",     icon: "terminal" },
 ];
 
 export const Sidebar: React.FC = () => {
@@ -101,20 +102,22 @@ export const Sidebar: React.FC = () => {
       {/* Footer links */}
       <div className="hairline-t" style={{ marginTop: 16, paddingTop: 16, display: "flex", flexDirection: "column", gap: 4 }}>
         <a
-          href="#"
-          onClick={(e) => e.preventDefault()}
+          href="https://github.com/Toaster496/Inavative-solutions"
+          target="_blank"
+          rel="noopener noreferrer"
           className="no-underline flex items-center label-sm"
           style={{ gap: 12, padding: "6px 14px", fontSize: 10, color: "var(--c-on-surface-variant)" }}
         >
-          <Icon name="help" size={14} /> SUPPORT_LOGS
+          <Icon name="code" size={14} /> SOURCE_CODE
         </a>
         <a
-          href="#"
-          onClick={(e) => e.preventDefault()}
+          href="https://github.com/Toaster496/Inavative-solutions/blob/gh-pages/README.md"
+          target="_blank"
+          rel="noopener noreferrer"
           className="no-underline flex items-center label-sm"
           style={{ gap: 12, padding: "6px 14px", fontSize: 10, color: "var(--c-on-surface-variant)" }}
         >
-          <Icon name="description" size={14} /> DOCS
+          <Icon name="description" size={14} /> TECHNICAL_DOCS
         </a>
         <div
           className="font-mono"

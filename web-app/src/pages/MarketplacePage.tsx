@@ -158,13 +158,13 @@ export const MarketplacePage: React.FC = () => {
         </div>
 
         <div className="hairline-t" style={{ marginTop: "auto", paddingTop: 16, display: "flex", flexDirection: "column", gap: 4 }}>
-          <a href="#" onClick={(e) => e.preventDefault()} className="no-underline flex items-center" style={{ gap: 8, padding: 8, color: "var(--c-outline)", transition: "color 120ms ease" }}
+          <a href="https://github.com/Toaster496/Inavative-solutions" target="_blank" rel="noopener noreferrer" className="no-underline flex items-center" style={{ gap: 8, padding: 8, color: "var(--c-outline)", transition: "color 120ms ease" }}
             onMouseEnter={(e) => (e.currentTarget.style.color = "var(--c-primary)")}
             onMouseLeave={(e) => (e.currentTarget.style.color = "var(--c-outline)")}>
             <Icon name="code" size={14} />
             <span className="label-sm" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.05em" }}>Source_Code</span>
           </a>
-          <a href="#" onClick={(e) => e.preventDefault()} className="no-underline flex items-center" style={{ gap: 8, padding: 8, color: "var(--c-outline)", transition: "color 120ms ease" }}
+          <a href="https://github.com/Toaster496/Inavative-solutions/blob/gh-pages/README.md" target="_blank" rel="noopener noreferrer" className="no-underline flex items-center" style={{ gap: 8, padding: 8, color: "var(--c-outline)", transition: "color 120ms ease" }}
             onMouseEnter={(e) => (e.currentTarget.style.color = "var(--c-primary)")}
             onMouseLeave={(e) => (e.currentTarget.style.color = "var(--c-outline)")}>
             <Icon name="book" size={14} />

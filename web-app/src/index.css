@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* ============================================================
    ComputeMarket — Terminal Grid Design System
    Redesign based on Stitch wireframes (DESIGN.md)

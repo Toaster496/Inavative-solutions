@@ -80,10 +80,16 @@ export const WalletGate: React.FC<WalletGateProps> = ({ children, requireWallet 
             operator console, manage compute jobs, and interact with the protocol.
           </p>
 
-          <button onClick={connectWallet} className="btn btn-primary" disabled={loading} style={{ padding: "14px 28px" }}>
-            <Icon name="link" size={16} />
-            {loading ? "Connecting…" : "Connect Wallet"}
-          </button>
+          <div className="flex flex-col sm:flex-row justify-center" style={{ gap: 12 }}>
+            <button onClick={connectWallet} className="btn btn-primary" disabled={loading} style={{ padding: "14px 28px" }}>
+              <Icon name="link" size={16} />
+              {loading ? "Connecting…" : "Connect MetaMask"}
+            </button>
+            <button onClick={() => useAppStore.getState().connectDemoWallet()} className="btn btn-ghost" style={{ padding: "14px 28px" }}>
+              <Icon name="play_circle" size={16} />
+              Continue as Demo
+            </button>
+          </div>
 
           <div
             className="hairline"
@@ -98,7 +104,7 @@ export const WalletGate: React.FC<WalletGateProps> = ({ children, requireWallet 
               &gt; SESSION_LOG
             </p>
             <p className="font-mono" style={{ fontSize: 11, color: "var(--c-on-surface-variant)" }}>
-              [INFO] No wallet detected. Call connectWallet() to initialise provider.
+              [INFO] No wallet detected. Connect MetaMask or continue with demo mode below.
             </p>
             <p className="font-mono" style={{ fontSize: 11, color: "var(--c-on-surface-variant)" }}>
               [INFO] Expected chain_id: 0x61 (BSC_TESTNET)
