@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Icon } from "../components/ui/Icon";
-import { useAppStore, type Rental } from "../store/appStore";
+import { useAppStore } from "../store/appStore";
 import {
   HARDWARE_LOGS,
   EXECUTING_JOBS,
@@ -9,16 +9,8 @@ import {
 } from "../lib/constants";
 
 export const DashboardPage: React.FC = () => {
-  const { isHost, hostInfo, submitHeartbeat, loading, rentals, terminateRental } = useAppStore();
-  const [tab, setTab] = useState<"executing" | "queue" | "archive" | "rentals">("executing");
-  const [, setTick] = useState(0);
-
-  useEffect(() => {
-    const id = setInterval(() => setTick((t) => t + 1), 1000);
-    return () => clearInterval(id);
-  }, []);
-
-  const allRentals = rentals;
+  const { isHost, hostInfo, submitHeartbeat, loading } = useAppStore();
+  const [tab, setTab] = useState<"executing" | "queue" | "archive">("executing");
 
   return (
     <div style={{ padding: 24 }}>
@@ -143,7 +135,6 @@ export const DashboardPage: React.FC = () => {
           <DashTab active={tab === "executing"} onClick={() => setTab("executing")} label="Executing" count={EXECUTING_JOBS.length} />
           <DashTab active={tab === "queue"} onClick={() => setTab("queue")} label="Queue" count={0} />
           <DashTab active={tab === "archive"} onClick={() => setTab("archive")} label="Archive" count={Number(hostInfo?.completedJobs || 0n)} />
-          <DashTab active={tab === "rentals"} onClick={() => setTab("rentals")} label="My Rentals" count={allRentals.length} />
         </div>
         <span className="label-sm" style={{ fontSize: 10, color: "var(--c-on-surface-variant)", textTransform: "uppercase", letterSpacing: "0.1em", opacity: 0.5 }}>
           Filter_Applied: None
@@ -173,9 +164,6 @@ export const DashboardPage: React.FC = () => {
             [INFO] {Number(hostInfo?.completedJobs || 0n)} job(s) completed historically. Connect an indexer to load full archive.
           </p>
         </div>
-      )}
-      {tab === "rentals" && (
-        <RentalsDashboard rentals={allRentals} onTerminate={(id) => terminateRental(id).catch(console.error)} />
       )}
     </div>
   );
@@ -407,121 +395,6 @@ const ExecutingJobCard: React.FC<{ job: (typeof EXECUTING_JOBS)[number] }> = ({ 
     </div>
   </div>
 );
-
-const RentalsDashboard: React.FC<{ rentals: Rental[]; onTerminate: (id: string) => void }> = ({ rentals, onTerminate }) => {
-  if (rentals.length === 0) {
-    return (
-      <div className="surface-low hairline" style={{ padding: 60, textAlign: "center" }}>
-        <Icon name="shopping_bag" size={32} className="text-outline" />
-        <p className="label-sm" style={{ marginTop: 16, color: "var(--c-on-surface-variant)" }}>
-          [INFO] No rentals yet. Browse the Marketplace to rent GPU compute.
-        </p>
-      </div>
-    );
-  }
-
-  const totalAccrued = rentals.reduce((sum, r) => {
-    const end = r.endedAt || Date.now();
-    return sum + r.pricePerHour * ((end - r.startedAt) / 3600000);
-  }, 0);
-
-  return (
-    <div>
-      <div className="grid grid-cols-2 md:grid-cols-4" style={{ gap: 12, marginBottom: 24 }}>
-        <div className="surface-container hairline" style={{ padding: 12 }}>
-          <span className="label-sm" style={{ fontSize: 9, color: "var(--c-on-surface-variant)", textTransform: "uppercase" }}>Total Rentals</span>
-          <p className="font-mono text-primary" style={{ fontSize: 22, fontWeight: 700 }}>{rentals.length}</p>
-        </div>
-        <div className="surface-container hairline" style={{ padding: 12 }}>
-          <span className="label-sm" style={{ fontSize: 9, color: "var(--c-on-surface-variant)", textTransform: "uppercase" }}>Active</span>
-          <p className="font-mono text-primary" style={{ fontSize: 22, fontWeight: 700 }}>{rentals.filter(r => r.status === 'active').length}</p>
-        </div>
-        <div className="surface-container hairline" style={{ padding: 12 }}>
-          <span className="label-sm" style={{ fontSize: 9, color: "var(--c-on-surface-variant)", textTransform: "uppercase" }}>Total Accrued</span>
-          <p className="font-mono text-primary tabular-nums" style={{ fontSize: 20, fontWeight: 700 }}>{totalAccrued.toFixed(2)} CPT</p>
-        </div>
-        <div className="surface-container hairline" style={{ padding: 12 }}>
-          <span className="label-sm" style={{ fontSize: 9, color: "var(--c-on-surface-variant)", textTransform: "uppercase" }}>Total Spent</span>
-          <p className="font-mono text-primary tabular-nums" style={{ fontSize: 20, fontWeight: 700 }}>{rentals.reduce((s, r) => s + r.totalCost, 0).toFixed(2)} CPT</p>
-        </div>
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: 16 }}>
-        {rentals.map((rental) => (
-          <RentalDashboardCard key={rental.id} rental={rental} onTerminate={onTerminate} />
-        ))}
-      </div>
-    </div>
-  );
-};
-
-const RentalDashboardCard: React.FC<{ rental: Rental; onTerminate: (id: string) => void }> = ({ rental, onTerminate }) => {
-  const now = Date.now();
-  const elapsed = rental.status === 'terminated' && rental.endedAt
-    ? (rental.endedAt - rental.startedAt) / 1000
-    : (now - rental.startedAt) / 1000;
-  const accrued = rental.status === 'terminated' && rental.endedAt
-    ? rental.pricePerHour * ((rental.endedAt - rental.startedAt) / 3600000)
-    : rental.pricePerHour * ((now - rental.startedAt) / 3600000);
-  const elapsedStr = formatDuration2(elapsed);
-  const isActive = rental.status === 'active';
-
-  return (
-    <div className="surface-low hairline" style={{ padding: 16 }}>
-      <div className="flex justify-between items-start" style={{ marginBottom: 12 }}>
-        <div>
-          <p className="font-mono text-primary" style={{ fontSize: 12, fontWeight: 700 }}>{rental.listingName}</p>
-          <p className="label-sm" style={{ fontSize: 9, color: "var(--c-on-surface-variant)", textTransform: "uppercase" }}>{rental.hardware}</p>
-        </div>
-        <span className={`status-dot ${isActive ? "live" : "offline"}`} />
-      </div>
-      <div className="grid grid-cols-2" style={{ gap: 8, marginBottom: 12 }}>
-        <div>
-          <span className="label-sm" style={{ fontSize: 8, color: "var(--c-on-surface-variant)", textTransform: "uppercase" }}>Elapsed</span>
-          <p className="font-mono tabular-nums" style={{ fontSize: 11, color: "var(--c-on-surface)" }}>{elapsedStr}</p>
-        </div>
-        <div>
-          <span className="label-sm" style={{ fontSize: 8, color: "var(--c-on-surface-variant)", textTransform: "uppercase" }}>Rate</span>
-          <p className="font-mono" style={{ fontSize: 11, color: "var(--c-on-surface)" }}>${rental.pricePerHour.toFixed(2)}/hr</p>
-        </div>
-        <div>
-          <span className="label-sm" style={{ fontSize: 8, color: "var(--c-on-surface-variant)", textTransform: "uppercase" }}>Paid</span>
-          <p className="font-mono" style={{ fontSize: 11, color: "var(--c-on-surface)" }}>{rental.totalCost.toFixed(2)} CPT</p>
-        </div>
-        <div>
-          <span className="label-sm" style={{ fontSize: 8, color: "var(--c-on-surface-variant)", textTransform: "uppercase" }}>Accrued</span>
-          <p className="font-mono text-primary tabular-nums" style={{ fontSize: 12, fontWeight: 700 }}>{accrued.toFixed(4)} CPT</p>
-        </div>
-      </div>
-      {isActive && (
-        <button
-          onClick={() => onTerminate(rental.id)}
-          className="btn btn-block"
-          style={{
-            padding: "6px 12px", fontSize: 10,
-            border: "1px solid var(--c-error)", color: "var(--c-error)",
-            background: "transparent", cursor: "pointer",
-            fontFamily: "var(--font-mono)", textTransform: "uppercase",
-          }}
-        >
-          <Icon name="stop" size={12} />
-          Terminate
-        </button>
-      )}
-      {!isActive && (
-        <span className="label-sm" style={{ fontSize: 9, color: "var(--c-on-surface-variant)", textTransform: "uppercase" }}>
-          Terminated
-        </span>
-      )}
-    </div>
-  );
-};
-
-function formatDuration2(totalSeconds: number): string {
-  const h = Math.floor(totalSeconds / 3600);
-  const m = Math.floor((totalSeconds % 3600) / 60);
-  const s = Math.floor(totalSeconds % 60);
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-}
 
 const DashTab: React.FC<{ active: boolean; onClick: () => void; label: string; count: number }> = ({
   active,

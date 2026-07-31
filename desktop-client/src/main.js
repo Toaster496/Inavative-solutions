@@ -1,43 +1,6 @@
 const { app, BrowserWindow, Tray, Menu, ipcMain, dialog } = require('electron');
 const path = require('path');
-const { spawn } = require('child_process');
 const { HostDaemon } = require('./hostDaemon');
-
-let sshServerProcess = null;
-
-function startSshServer() {
-  const serverDir = path.join(__dirname, '..', '..', 'server');
-  try {
-    sshServerProcess = spawn(process.execPath, [path.join(serverDir, 'start.js')], {
-      cwd: serverDir,
-      stdio: 'pipe',
-    });
-    sshServerProcess.stdout.on('data', (data) => {
-      console.log(`[SSH Server] ${data}`);
-    });
-    sshServerProcess.stderr.on('data', (data) => {
-      console.error(`[SSH Server] ${data}`);
-    });
-    sshServerProcess.on('error', (err) => {
-      console.error('[SSH Server] Failed to start:', err.message);
-    });
-    sshServerProcess.on('exit', (code) => {
-      console.log(`[SSH Server] Exited with code ${code}`);
-      sshServerProcess = null;
-    });
-    console.log('[SSH Server] Starting...');
-  } catch (err) {
-    console.error('[SSH Server] Error starting:', err.message);
-  }
-}
-
-function stopSshServer() {
-  if (sshServerProcess) {
-    sshServerProcess.kill();
-    sshServerProcess = null;
-    console.log('[SSH Server] Stopped');
-  }
-}
 
 let mainWindow;
 let tray = null;
@@ -193,7 +156,6 @@ async function initializeHostDaemon() {
 }
 
 app.whenReady().then(async () => {
-  startSshServer();
   createTray();
   await initializeHostDaemon();
   createWindow();
@@ -214,7 +176,6 @@ app.on('activate', () => {
 
 // Cleanup on quit
 app.on('will-quit', async () => {
-  stopSshServer();
   if (hostDaemon) {
     await hostDaemon.stop();
   }

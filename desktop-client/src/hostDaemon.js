@@ -1,7 +1,3 @@
-const { createLibp2p } = require('libp2p');
-const { tcp } = require('@libp2p/tcp');
-const { mplex } = require('@libp2p/mplex');
-const { noise } = require('@libp2p/noise');
 const { ethers } = require('ethers');
 const Docker = require('dockerode');
 const { v4: uuidv4 } = require('uuid');
@@ -158,6 +154,12 @@ class HostDaemon {
       }
       
       // Initialize libp2p node for peer-to-peer communication
+      const [{ createLibp2p }, { tcp }, { mplex }, { noise }] = await Promise.all([
+        import('libp2p'),
+        import('@libp2p/tcp'),
+        import('@libp2p/mplex'),
+        import('@chainsafe/libp2p-noise')
+      ]);
       this.node = await createLibp2p({
         addresses: {
           listen: ['/ip4/0.0.0.0/tcp/0']
@@ -317,12 +319,10 @@ class HostDaemon {
                 Count: -1, // All GPUs
                 Capabilities: [['gpu']]
               }
-            ]
-          },
-          ExposedPorts: { '8000/tcp': {} },
-          HostConfig: {
+            ],
             PortBindings: { '8000/tcp': [{ HostPort: '8000' }] }
-          }
+          },
+          ExposedPorts: { '8000/tcp': {} }
         };
       }
       

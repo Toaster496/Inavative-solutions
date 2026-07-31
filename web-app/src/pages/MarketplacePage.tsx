@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from "react";
 import { Icon } from "../components/ui/Icon";
-import { RentalModal } from "../components/RentalModal";
 import { MARKETPLACE_LISTINGS, MarketplaceListing, NETWORK_STATS } from "../lib/constants";
 
 type Tier = MarketplaceListing["tier"];
@@ -44,7 +43,6 @@ export const MarketplacePage: React.FC = () => {
   const [activeOnly, setActiveOnly] = useState(true);
   const [maxPrice, setMaxPrice] = useState(10);
   const [sortAsc, setSortAsc] = useState(true);
-  const [rentalListing, setRentalListing] = useState<MarketplaceListing | null>(null);
 
   const filtered = useMemo(() => {
     let list = MARKETPLACE_LISTINGS.filter((l) => {
@@ -273,24 +271,16 @@ export const MarketplacePage: React.FC = () => {
             }}
           >
             {filtered.map((node) => (
-              <NodeCard key={node.id} node={node} onRent={setRentalListing} />
+              <NodeCard key={node.id} node={node} />
             ))}
           </div>
         )}
       </main>
-
-      {rentalListing && (
-        <RentalModal
-          listing={rentalListing}
-          onClose={() => setRentalListing(null)}
-          onRented={() => {}}
-        />
-      )}
     </div>
   );
 };
 
-const NodeCard: React.FC<{ node: MarketplaceListing; onRent: (node: MarketplaceListing) => void }> = ({ node, onRent }) => {
+const NodeCard: React.FC<{ node: MarketplaceListing }> = ({ node }) => {
   return (
     <div
       className="bg-surface"
@@ -383,7 +373,6 @@ const NodeCard: React.FC<{ node: MarketplaceListing; onRent: (node: MarketplaceL
           className="btn btn-primary"
           style={{ flex: 1, padding: "8px 12px", fontSize: 11 }}
           disabled={!node.online}
-          onClick={() => onRent(node)}
         >
           Initialize_Rent
         </button>
